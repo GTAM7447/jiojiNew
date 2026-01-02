@@ -32,11 +32,7 @@ public class DataInitializer {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.admin.default-email}")
-    private String defaultAdminEmail;
 
-    @Value("${app.admin.default-password}")
-    private String defaultAdminPassword;
 
     @Bean
     public CommandLineRunner initData() {
