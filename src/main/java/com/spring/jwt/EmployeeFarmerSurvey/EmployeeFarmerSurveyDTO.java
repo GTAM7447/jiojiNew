@@ -1,5 +1,6 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
+import com.spring.jwt.Enums.FormStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -85,4 +86,8 @@ public class EmployeeFarmerSurveyDTO {
     @Schema(description = "Employee(User) ID who filled the survey",
             example = "10005")
     private Long userId;
+
+    private FormStatus formStatus;
+
+    private FarmerSelfieDTO farmerSelfie;
 }
