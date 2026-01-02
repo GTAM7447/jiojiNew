@@ -48,8 +48,11 @@ public class UserServiceImpl implements UserService
 
     private final UserMapper userMapper;
 
-    @Value("${app.url.password-reset}")
-    private String passwordResetUrl;
+//    @Value("${app.url.password-reset}")
+//    private String passwordResetUrl;
+@Value("${app.url.password-reset:http://localhost:3000/reset-password}")
+private String passwordResetUrl;
+
 
     @Override
     @Transactional
