@@ -42,7 +42,7 @@ public class DataInitializer {
     public CommandLineRunner initData() {
         return args -> {
             initRoles();
-            initAdmin();
+//            initAdmin();
             initProducts();
         };
     }
@@ -63,27 +63,8 @@ public class DataInitializer {
         }
     }
 
-    private void initAdmin() {
-        if (userRepository.findByEmail(defaultAdminEmail) == null) {
-            User admin = new User();
-            admin.setEmail(defaultAdminEmail);
-            admin.setPassword(passwordEncoder.encode(defaultAdminPassword));
-            admin.setMobileNumber(1234567890L);
-            admin.setEmailVerified(true);
-            admin.setFirstName("Admin");
-            admin.setLastName("User");
-            admin.setCreatedAt(LocalDateTime.now());
-            admin.setStatus(true); // Active
 
-            Set<Role> roles = new HashSet<>();
-            Role adminRole = roleRepository.findByName("ADMIN");
-            roles.add(adminRole);
-            admin.setRoles(roles);
 
-            userRepository.save(admin);
-            log.info("Default Admin created: {}", defaultAdminEmail);
-        }
-    }
 
     private void initProducts() {
         if (productRepository.count() == 0) {
