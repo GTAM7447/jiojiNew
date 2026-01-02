@@ -1,5 +1,6 @@
 package com.spring.jwt.entity;
 
+import com.spring.jwt.Enums.FormStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -79,6 +80,8 @@ public class EmployeeFarmerSurvey {
             nullable = false
     )
     private User user;
+
+    private FormStatus formStatus;
 
 
 

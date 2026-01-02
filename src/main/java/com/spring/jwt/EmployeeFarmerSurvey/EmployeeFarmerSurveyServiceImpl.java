@@ -1,7 +1,10 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
+import com.spring.jwt.Enums.FormStatus;
+import com.spring.jwt.FarmerSelfieEmployeeFarmerSurvey.FarmerSelfieEmployeeFarmerSurveyRepository;
 import com.spring.jwt.entity.EmployeeFarmerSurvey;
 import com.spring.jwt.entity.User;
+import com.spring.jwt.exception.ResourceNotFoundException;
 import com.spring.jwt.exception.UserAlreadyExistException;
 import com.spring.jwt.exception.UserNotFoundExceptions;
 import com.spring.jwt.repository.UserRepository;
@@ -27,6 +30,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     private final UserRepository userRepository;
     private final EmployeeFarmerSurveyMapper surveyMapper;
     private final SecurityUtil securityUtil;
+    private final FarmerSelfieEmployeeFarmerSurveyRepository selfieRepository;
 
 
     @Override
@@ -42,6 +46,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
         EmployeeFarmerSurvey survey = surveyMapper.toEntityReg(dto, user);
         survey.setFormNumber(formNumber);
         survey.setUser(user);
+        survey.setFormStatus(FormStatus.NOTACTIVE);
         EmployeeFarmerSurvey savedSurvey = employeeFarmerSurveyRepository.save(survey);
         return surveyMapper.toDto(savedSurvey);
     }
@@ -51,10 +56,24 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     @Override
     public EmployeeFarmerSurveyDTO getSurveyById(Long surveyId) {
 
-        EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId)
-                .orElseThrow(() -> new UserNotFoundExceptions("Survey not found with ID: " + surveyId));
-        return surveyMapper.toDto(survey);
+        EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with ID: " + surveyId));
+        EmployeeFarmerSurveyDTO dto = surveyMapper.toDto(survey);
+        FarmerSelfieDTO selfieDTO = new FarmerSelfieDTO();
+        selfieRepository.findBySurvey_SurveyId(surveyId).ifPresentOrElse(
+                        selfie -> {
+                            selfieDTO.setImageUrl(selfie.getImageUrl());
+                            selfieDTO.setTakenAt(selfie.getTakenAt());
+                            selfieDTO.setMessage("Selfie found");
+                            },
+                        () -> {
+                            selfieDTO.setMessage("Farmer selfie not uploaded yet");
+                        }
+                );
+        dto.setFarmerSelfie(selfieDTO);
+        return dto;
     }
+
+
 
     @Override
     @Transactional
