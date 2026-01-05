@@ -40,17 +40,21 @@ public class FarmerSelfieEmployeeFarmerSurveyController {
      *  - Only one selfie is allowed per survey
      *
      * @param surveyId ID of the Employee Farmer Survey
-     * @param image    Multipart image file to be uploaded
+     * @param selfie    Multipart image file to be uploaded
      * @return         Created FarmerSelfieResponseDTO
      */
     @PostMapping("/upload")
     public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseUploadDTO>> uploadSelfie(
             @RequestParam Long surveyId,
-            @RequestParam MultipartFile image) {
+            @RequestParam("selfie") MultipartFile selfie) {
 
-        FarmerSelfieResponseUploadDTO response = selfieService.uploadSelfie(surveyId, image);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new BaseResponseDTO1<>("201", "Farmer selfie uploaded successfully", response));
+        FarmerSelfieResponseUploadDTO response =
+                selfieService.uploadSelfie(surveyId, selfie);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new BaseResponseDTO1<>("201", "Farmer selfie uploaded successfully", response));
     }
+
 
 
     /**
