@@ -181,8 +181,9 @@ public class AppConfig {
 
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
-                .requestMatchers("/api/v1/**").authenticated()
+                .requestMatchers("/api/v1/**").permitAll()
                 .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
+                .requestMatchers("/api/v1/lab_report/**").permitAll()
 
                 .anyRequest().authenticated());
 
