@@ -146,7 +146,6 @@ public class AppConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(jwtConfig.getUrl()).permitAll()
                 .requestMatchers(jwtConfig.getRefreshUrl()).permitAll()
-
                 .requestMatchers("/api/v1/survey/**").permitAll()
                 .requestMatchers("/api/v1/farmer-selfie/**").permitAll()
                 .requestMatchers(("/api/v1/farmer-form/**")).permitAll()
@@ -183,6 +182,7 @@ public class AppConfig {
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                 .requestMatchers("/api/v1/**").authenticated()
+                .requestMatchers("api/v1/farmer_selfie_Survey").permitAll()
 
                 .anyRequest().authenticated());
 

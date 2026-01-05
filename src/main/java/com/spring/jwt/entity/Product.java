@@ -30,7 +30,15 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "TEXT")
+    private String description1;
+
+    @Column(columnDefinition = "TEXT")
+    private String description2;
+
     private Double price;
+
+    private Double offers;
 
     private Boolean active = true;
 
