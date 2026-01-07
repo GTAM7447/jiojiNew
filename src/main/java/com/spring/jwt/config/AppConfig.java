@@ -186,6 +186,7 @@ public class AppConfig {
                 .requestMatchers("/api/v1/**").permitAll()
                 .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
                 .requestMatchers("/api/v1/lab_report/**").permitAll()
+                .requestMatchers("/api/v1/products/**").permitAll()
 
                 .anyRequest().authenticated());
 

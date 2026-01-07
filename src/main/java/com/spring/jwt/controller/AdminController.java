@@ -4,7 +4,6 @@ import com.spring.jwt.dto.UserDTO;
 import com.spring.jwt.entity.Product;
 import com.spring.jwt.entity.Role;
 import com.spring.jwt.entity.User;
-import com.spring.jwt.repository.ProductRepository;
 import com.spring.jwt.repository.RoleRepository;
 import com.spring.jwt.repository.UserRepository;
 import com.spring.jwt.utils.BaseResponseDTO;
@@ -29,7 +28,7 @@ public class AdminController {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ProductRepository productRepository;
+//    private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
 
     // Employee Management
@@ -127,46 +126,46 @@ public class AdminController {
 
     // Product Management
 
-    @PostMapping("/products")
-    public ResponseEntity<BaseResponseDTO> addProduct(@RequestBody Product product) {
-        product.setCreatedAt(LocalDateTime.now());
-        productRepository.save(product);
-        return ResponseEntity.ok(new BaseResponseDTO("200", "Product added successfully", null));
-    }
+//    @PostMapping("/products")
+//    public ResponseEntity<BaseResponseDTO> addProduct(@RequestBody Product product) {
+//        product.setCreatedAt(LocalDateTime.now());
+//        productRepository.save(product);
+//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product added successfully", null));
+//    }
 
-    @PutMapping("/products/{productId}")
-    public ResponseEntity<BaseResponseDTO> updateProduct(@PathVariable Long productId,
-            @RequestBody Product productDetails) {
-        Optional<Product> prodOpt = productRepository.findById(productId);
-        if (prodOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponseDTO("404", "Product not found", null));
-        }
-        Product product = prodOpt.get();
-        product.setProductName(productDetails.getProductName());
-        product.setProductType(productDetails.getProductType());
-        product.setDescription(productDetails.getDescription());
-        product.setPrice(productDetails.getPrice());
-        product.setActive(productDetails.getActive());
+//    @PutMapping("/products/{productId}")
+//    public ResponseEntity<BaseResponseDTO> updateProduct(@PathVariable Long productId,
+//            @RequestBody Product productDetails) {
+//        Optional<Product> prodOpt = productRepository.findById(productId);
+//        if (prodOpt.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(new BaseResponseDTO("404", "Product not found", null));
+//        }
+//        Product product = prodOpt.get();
+//        product.setProductName(productDetails.getProductName());
+//        product.setProductType(productDetails.getProductType());
+//        product.setDescription(productDetails.getDescription());
+//        product.setPrice(productDetails.getPrice());
+//        product.setActive(productDetails.getActive());
+//
+//        productRepository.save(product);
+//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product updated successfully", null));
+//    }
 
-        productRepository.save(product);
-        return ResponseEntity.ok(new BaseResponseDTO("200", "Product updated successfully", null));
-    }
-
-    @DeleteMapping("/products/{productId}")
-    public ResponseEntity<BaseResponseDTO> deleteProduct(@PathVariable Long productId) {
-        if (!productRepository.existsById(productId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponseDTO("404", "Product not found", null));
-        }
-        productRepository.deleteById(productId);
-        return ResponseEntity.ok(new BaseResponseDTO("200", "Product deleted successfully", null));
-    }
-
-    @GetMapping("/products")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productRepository.findAll());
-    }
+//    @DeleteMapping("/products/{productId}")
+//    public ResponseEntity<BaseResponseDTO> deleteProduct(@PathVariable Long productId) {
+//        if (!productRepository.existsById(productId)) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                    .body(new BaseResponseDTO("404", "Product not found", null));
+//        }
+//        productRepository.deleteById(productId);
+//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product deleted successfully", null));
+//    }
+//
+//    @GetMapping("/products")
+//    public ResponseEntity<List<Product>> getAllProducts() {
+//        return ResponseEntity.ok(productRepository.findAll());
+//    }
 
     // Helper
     private UserDTO convertToDTO(User user) {
