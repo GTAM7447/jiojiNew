@@ -75,7 +75,7 @@ public class AuthController {
             accessTokenCookie.setHttpOnly(false); // Accessible to JS if needed, or secure
             accessTokenCookie.setSecure(true);
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(jwtConfig.getExpiration());
+            accessTokenCookie.setMaxAge((int) jwtConfig.getExpiration());
             response.addCookie(accessTokenCookie);
 
             Map<String, Object> responseData = new HashMap<>();

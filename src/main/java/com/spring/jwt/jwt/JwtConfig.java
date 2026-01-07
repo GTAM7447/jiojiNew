@@ -20,8 +20,8 @@ public class JwtConfig {
     @Value("${jwt.prefix:Bearer}")
     private String prefix;
 
-    @Value("${jwt.expiration:#{60*3600}}")
-    private int expiration;
+    @Value("${jwt.expiration:#{60 * 60 * 1000}}")
+    private long expiration;
 
     @Value("${jwt.refresh-expiration:#{7*24*60*60}}")
     private int refreshExpiration;
