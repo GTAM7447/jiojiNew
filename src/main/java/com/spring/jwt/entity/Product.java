@@ -1,19 +1,21 @@
 package com.spring.jwt.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "products", indexes = {
-        @Index(name = "idx_products_name", columnList = "productName"),
-        @Index(name = "idx_products_type", columnList = "productType"),
-        @Index(name = "idx_products_active", columnList = "active")
-})
+@Table(
+        name = "products",
+        indexes = {
+                @Index(name = "idx_products_name", columnList = "productName"),
+                @Index(name = "idx_products_type", columnList = "productType"),
+                @Index(name = "idx_products_active", columnList = "active")
+        }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product {
@@ -27,22 +29,18 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductType productType;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Column(columnDefinition = "TEXT")
-    private String description1;
-
-    @Column(columnDefinition = "TEXT")
-    private String description2;
-
     private Double price;
-
     private Double offers;
-
     private Boolean active = true;
-
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    private List<ProductSection> sections;
 
     public enum ProductType {
         SEED, FERTILIZER

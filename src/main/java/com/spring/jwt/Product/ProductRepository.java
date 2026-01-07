@@ -1,4 +1,4 @@
-package com.spring.jwt.repository;
+package com.spring.jwt.Product;
 
 import com.spring.jwt.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
