@@ -129,7 +129,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends AbstractAuthenticat
             accessTokenCookie.setHttpOnly(false);
             accessTokenCookie.setSecure(true);
             accessTokenCookie.setPath("/");
-            accessTokenCookie.setMaxAge(jwtConfig.getExpiration());
+            accessTokenCookie.setMaxAge((int) jwtConfig.getExpiration());
             response.addCookie(accessTokenCookie);
 
             Map<String, Object> responseData = new HashMap<>();

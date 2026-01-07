@@ -42,7 +42,7 @@ public class CookieService {
         cookie.setHttpOnly(false);
         cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setMaxAge(jwtConfig.getExpiration());
+        cookie.setMaxAge((int) jwtConfig.getExpiration());
         return cookie;
     }
     
