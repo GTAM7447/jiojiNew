@@ -15,4 +15,5 @@ public interface ProductService {
     ProductDTO patch(Long id, ProductDTO dto) throws BadRequestException;
 
     void delete(Long id) throws BadRequestException;
+
 }

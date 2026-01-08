@@ -34,14 +34,12 @@ public class FarmerLabReportController {
 
     private final FarmerLabReportService labReportService;
 
-    /**
-     * Uploads a new lab report PDF for a given survey.
-     *
-     * @param surveyId the unique identifier of the survey
-     * @param file the PDF file to upload
-     * @return success response with uploaded lab report details
-     */
-    @PostMapping("/upload/{surveyId}")
+    /* ===================== UPLOAD ===================== */
+
+    @PostMapping(
+            value = "/upload/{surveyId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<BaseResponseDTO1<FarmerLabReportUploadDTO>> upload(
             @PathVariable Long surveyId,
             @RequestParam MultipartFile file) {
@@ -58,12 +56,8 @@ public class FarmerLabReportController {
         );
     }
 
-    /**
-     * Retrieves lab report details using survey ID.
-     *
-     * @param surveyId the unique identifier of the survey
-     * @return success response with lab report details
-     */
+    /* ===================== VIEW ===================== */
+
     @GetMapping("/view/{surveyId}")
     public ResponseEntity<BaseResponseDTO1<FarmerLabReportViewDTO>> view(
             @PathVariable Long surveyId) {
@@ -80,12 +74,7 @@ public class FarmerLabReportController {
         );
     }
 
-    /**
-     * Retrieves lab report details using report ID.
-     *
-     * @param reportId the unique identifier of the lab report
-     * @return success response with lab report details
-     */
+
     @GetMapping("/get/{reportId}")
     public ResponseEntity<BaseResponseDTO1<FarmerLabReportViewDTO>> getById(
             @PathVariable Long reportId) {
@@ -102,15 +91,12 @@ public class FarmerLabReportController {
         );
     }
 
+    /* ===================== UPDATE ===================== */
 
-    /**
-     * Updates an existing lab report PDF using survey ID.
-     *
-     * @param surveyId the unique identifier of the survey
-     * @param file the new PDF file to replace the existing report
-     * @return success response with updated lab report details
-     */
-    @PatchMapping("/update/{surveyId}")
+    @PatchMapping(
+            value = "/update/{surveyId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<BaseResponseDTO1<FarmerLabReportUploadDTO>> update(
             @PathVariable Long surveyId,
             @RequestParam MultipartFile file) {
@@ -127,14 +113,8 @@ public class FarmerLabReportController {
         );
     }
 
+    /* ===================== DELETE ===================== */
 
-
-    /**
-     * Deletes the lab report associated with the given survey ID.
-     *
-     * @param surveyId the unique identifier of the survey
-     * @return success response confirming deletion
-     */
     @DeleteMapping("/delete/{surveyId}")
     public ResponseEntity<BaseResponseDTO1<Void>> delete(
             @PathVariable Long surveyId) {
@@ -150,28 +130,23 @@ public class FarmerLabReportController {
         );
     }
 
+    /* ===================== DOWNLOAD ===================== */
 
-
-    /**
-     * Downloads the lab report PDF associated with the given survey ID.
-     *
-     * <p>
-     * Returns the PDF as a byte stream with appropriate headers
-     * for file download.
-     * </p>
-     *
-     * @param surveyId the unique identifier of the survey
-     * @return PDF file as byte array
-     */
-    @GetMapping("/download/{surveyId}")
+    @GetMapping(
+            value = "/download/{surveyId}",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
     public ResponseEntity<byte[]> download(@PathVariable Long surveyId) {
 
         byte[] pdf = labReportService.downloadLabReport(surveyId);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=lab-report-" + surveyId + ".pdf")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=lab-report-" + surveyId + ".pdf"
+                )
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
 }

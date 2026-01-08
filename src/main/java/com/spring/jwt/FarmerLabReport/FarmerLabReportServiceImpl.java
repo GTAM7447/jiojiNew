@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
     private final FarmerLabReportRepository labReportRepository;
     private final EmployeeFarmerSurveyRepository surveyRepository;
 
-
+    /* ===================== UPLOAD ===================== */
 
     @Override
     @Transactional
@@ -41,17 +40,17 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         }
 
         try {
-            long startTime = System.currentTimeMillis();
-
             FarmerLabReport report = new FarmerLabReport();
             report.setSurvey(survey);
-            report.setPdfUrl(encodeBase64(file));
+
+            // ✅ SAVE DIRECTLY AS BLOB
+            report.setPdfUrl(file.getBytes());
+
             report.setUploadedAt(LocalDateTime.now());
 
             FarmerLabReport saved = labReportRepository.save(report);
 
-            log.info("Lab report uploaded successfully for surveyId={} in {} ms",
-                    surveyId, System.currentTimeMillis() - startTime);
+            log.info("Lab report uploaded successfully for surveyId={}", surveyId);
 
             return mapToUploadDTO(saved);
 
@@ -61,7 +60,7 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         }
     }
 
-
+    /* ===================== VIEW ===================== */
 
     @Override
     public FarmerLabReportViewDTO viewLabReport(Long surveyId) {
@@ -73,8 +72,6 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         return mapToViewDTO(report);
     }
 
-
-
     @Override
     public FarmerLabReportViewDTO getLabReportById(Long reportId) {
 
@@ -85,7 +82,7 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         return mapToViewDTO(report);
     }
 
-
+    /* ===================== UPDATE ===================== */
 
     @Override
     @Transactional
@@ -99,7 +96,8 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
                         new ResourceNotFoundException("Lab report not found for survey ID: " + surveyId));
 
         try {
-            report.setPdfUrl(encodeBase64(file));
+            // ✅ UPDATE BLOB
+            report.setPdfUrl(file.getBytes());
             report.setUploadedAt(LocalDateTime.now());
 
             FarmerLabReport updated = labReportRepository.save(report);
@@ -113,7 +111,7 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         }
     }
 
-
+    /* ===================== DELETE ===================== */
 
     @Override
     @Transactional
@@ -127,7 +125,7 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
         log.info("Lab report deleted successfully for surveyId={}", surveyId);
     }
 
-
+    /* ===================== DOWNLOAD ===================== */
 
     @Override
     public byte[] downloadLabReport(Long surveyId) {
@@ -136,9 +134,11 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Lab report not found for survey ID: " + surveyId));
 
-        return Base64.getDecoder().decode(report.getPdfUrl());
+        // ✅ RETURN RAW PDF BYTES FROM MYSQL
+        return report.getPdfUrl();
     }
 
+    /* ===================== VALIDATIONS ===================== */
 
     private void validateSurveyId(Long surveyId) {
         if (surveyId == null || surveyId <= 0) {
@@ -147,36 +147,43 @@ public class FarmerLabReportServiceImpl implements FarmerLabReportService {
     }
 
     private void validatePdf(MultipartFile file) {
+
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("PDF file is required");
         }
-        if (!"application/pdf".equalsIgnoreCase(file.getContentType())) {
+
+        if (file.getContentType() == null ||
+                !file.getContentType().equalsIgnoreCase("application/pdf")) {
             throw new IllegalArgumentException("Only PDF files are allowed");
+        }
+
+        long maxSize = 5 * 1024 * 1024; // 5 MB
+        if (file.getSize() > maxSize) {
+            throw new IllegalArgumentException("PDF size must be less than 5MB");
         }
     }
 
-    private String encodeBase64(MultipartFile file) {
-        try {
-            return Base64.getEncoder().encodeToString(file.getBytes());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to encode PDF", e);
-        }
+    /* ===================== DTO MAPPERS ===================== */
+
+
+    private FarmerLabReportViewDTO mapToViewDTO(FarmerLabReport report) {
+        FarmerLabReportViewDTO dto = new FarmerLabReportViewDTO();
+        dto.setReportId(report.getReportId());
+        dto.setSurveyId(report.getSurvey().getSurveyId());
+        dto.setUploadedAt(report.getUploadedAt());
+        dto.setDownloadUrl(
+                "/api/v1/lab_report/download/" + report.getSurvey().getSurveyId()
+        );
+
+        return dto;
     }
 
     private FarmerLabReportUploadDTO mapToUploadDTO(FarmerLabReport report) {
         FarmerLabReportUploadDTO dto = new FarmerLabReportUploadDTO();
         dto.setReportId(report.getReportId());
         dto.setSurveyId(report.getSurvey().getSurveyId());
-        dto.setPdfUrl(report.getPdfUrl());
         return dto;
     }
 
-    private FarmerLabReportViewDTO mapToViewDTO(FarmerLabReport report) {
-        FarmerLabReportViewDTO dto = new FarmerLabReportViewDTO();
-        dto.setReportId(report.getReportId());
-        dto.setSurveyId(report.getSurvey().getSurveyId());
-        dto.setPdfUrl(report.getPdfUrl());
-        dto.setUploadedAt(report.getUploadedAt());
-        return dto;
-    }
+
 }
