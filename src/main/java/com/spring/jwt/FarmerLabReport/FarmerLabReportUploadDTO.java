@@ -6,5 +6,4 @@ import lombok.Data;
 public class FarmerLabReportUploadDTO {
     private Long reportId;
     private Long surveyId;
-    private String pdfUrl;
 }

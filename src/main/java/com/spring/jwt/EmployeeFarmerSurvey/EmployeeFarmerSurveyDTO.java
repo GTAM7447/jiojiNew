@@ -24,7 +24,7 @@ public class EmployeeFarmerSurveyDTO {
 
     @NotBlank(message = "Farmer name is required")
     @Pattern(
-            regexp = "^[A-Z][A-Za-z ]{2,50}$",
+            regexp = "[aA-Za-z ]{2,50}$",
             message = "Farmer name must start with capital letter and contain only letters and spaces (2–50 characters)"
     )
     @Schema(description = "Name of the farmer", example = "Ramesh Patil")

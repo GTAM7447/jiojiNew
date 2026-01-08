@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 public class FarmerLabReportViewDTO {
     private Long reportId;
     private Long surveyId;
-    private String pdfUrl;
     private LocalDateTime uploadedAt;
+    private String downloadUrl;
 }
