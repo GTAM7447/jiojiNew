@@ -1,5 +1,6 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
+import com.spring.jwt.Enums.FormStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -74,7 +75,7 @@ public class EmployeeFarmerSurveyRegDTO {
     @NotNull(message = "Sample status is required")
     @Schema(description = "Sample collected status", example = "true")
     private Boolean sampleCollected;
-
+    private FormStatus formStatus;
 
 
 }

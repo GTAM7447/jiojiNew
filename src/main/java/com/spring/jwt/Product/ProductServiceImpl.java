@@ -1,11 +1,15 @@
 package com.spring.jwt.Product;
 
+import com.spring.jwt.ProductPhoto.ProductPhotoRepository;
 import com.spring.jwt.entity.Product;
 import com.spring.jwt.entity.ProductSection;
 import com.spring.jwt.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductPhotoRepository productPhotoRepository;
 
 
     @Override
@@ -42,8 +47,24 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDTO getById(Long id) throws BadRequestException {
-        return mapToDto(getProduct(id));
+    public ProductDTO getById(Long productId) throws BadRequestException {
+        Product product=productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + productId));
+        ProductDTO dto = mapToDto(product);
+        ProductPhotoDTO photoDTO = new ProductPhotoDTO();
+        productPhotoRepository.findByProduct_ProductId(productId)
+                .ifPresentOrElse(
+                        photo->{
+                            photoDTO.setImageUrl(photo.getImageUrl());
+                            photoDTO.setUploadedAt(photo.getUploadedAt());
+                            photoDTO.setMessage("Product Photo Found");
+                        },
+                        ()->{
+                            photoDTO.setMessage("Product Photo Not Uploaded");
+                        }
+                );
+        dto.setPhotoDTO(photoDTO);
+        return dto;
     }
 
     @Override
@@ -53,6 +74,35 @@ public class ProductServiceImpl implements ProductService {
                 .stream()
                 .map(this::mapToDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public Page<ProductDTO> getAllByProductType(Product.ProductType productType , Pageable pageable){
+        Page<Product> page = productRepository.findByProductType(productType, pageable);
+
+        if (pageable.getPageNumber()>=page.getTotalPages()
+        && page.getTotalPages()>0){
+            throw new ResourceNotFoundException("Page not found. Requested Page: " + pageable.getPageNumber());
+        }
+        return page.map(this::mapToDto);
+    }
+
+    @Override
+    @Transactional
+    public Page<ProductDTO> getAllByProductTypeAndCategory(Product.ProductType productType, Product.Category category, Pageable pageable){
+        Page<Product> page;
+        if (category==Product.Category.ALL){
+            page=productRepository.findByProductType(productType, pageable);
+
+        }else {
+            page=productRepository.findByProductTypeAndCategory(productType, category, pageable);
+        }
+        if (pageable.getPageNumber()>=page.getTotalPages()
+         && page.getTotalPages()>0){
+            throw new ResourceNotFoundException("Page not found. Requested Page: " + pageable.getPageNumber());
+        }
+        return page.map(this::mapToDto);
     }
 
 

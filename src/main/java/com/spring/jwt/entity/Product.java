@@ -29,6 +29,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductType productType;
 
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
     private Double price;
     private Double offers;
     private Boolean active = true;
@@ -44,5 +47,8 @@ public class Product {
 
     public enum ProductType {
         SEED, FERTILIZER
+    }
+    public enum Category {
+        RABI, KHARIF, ALL
     }
 }

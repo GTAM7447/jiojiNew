@@ -1,6 +1,7 @@
 package com.spring.jwt.FarmerSelfieEmployeeFarmerSurvey;
 
 import com.spring.jwt.EmployeeFarmerSurvey.BaseResponseDTO1;
+import com.spring.jwt.Enums.PhotoType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,81 +32,201 @@ public class FarmerSelfieEmployeeFarmerSurveyController {
      */
     private final FarmerSelfieEmployeeFarmerSurveyService selfieService;
 
+
     /**
-     * Upload a farmer selfie image for a given survey.
+     * Upload a farmer selfie for a specific survey and photo type.
      *
-     * Business Rules:
-     *  - A valid surveyId must be provided
-     *  - Only image files are allowed
-     *  - Only one selfie is allowed per survey
+     * This API:
+     * - Accepts multipart image upload
+     * - Associates selfie with a survey
+     * - Differentiates selfie using PhotoType (FRONT / LEFT / RIGHT etc.)
+     * - Prevents duplicate uploads for same survey + photoType
      *
-     * @param surveyId ID of the Employee Farmer Survey
-     * @param selfie    Multipart image file to be uploaded
-     * @return         Created FarmerSelfieResponseDTO
+     * HTTP Method: POST
+     * URL: /api/v1/farmer-selfie/upload
      */
     @PostMapping("/upload")
     public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseUploadDTO>> uploadSelfie(
+
             @RequestParam Long surveyId,
-            @RequestParam("selfie") MultipartFile selfie) {
+            @RequestParam PhotoType photoType,
+            @RequestParam MultipartFile file) {
 
+        // Delegate business logic to service layer
         FarmerSelfieResponseUploadDTO response =
-                selfieService.uploadSelfie(surveyId, selfie);
+                selfieService.uploadSelfie(surveyId, photoType, file);
 
+        // Return CREATED (201) status with standardized response wrapper
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new BaseResponseDTO1<>("201", "Farmer selfie uploaded successfully", response));
+                .body(new BaseResponseDTO1<>(
+                        "201",
+                        "Farmer selfie uploaded successfully",
+                        response
+                ));
     }
 
 
 
+
     /**
-     * Fetch farmer selfie details using selfie ID.
+     * Fetch farmer selfie details using selfieId.
      *
-     * @param selfieId Unique ID of the farmer selfie
-     * @return         FarmerSelfieResponseDTO containing selfie details
+     * Use case:
+     * - Admin or mobile app wants selfie details using unique selfie identifier
+     *
+     * HTTP Method: GET
+     * URL: /api/v1/farmer-selfie/{selfieId}
      */
     @GetMapping("/{selfieId}")
     public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseDTO>> getBySelfieId(
+
+            // Unique ID of the selfie
             @PathVariable Long selfieId) {
 
-        FarmerSelfieResponseDTO response = selfieService.getSelfieById(selfieId);
+        // Fetch selfie details from service
+        FarmerSelfieResponseDTO response =
+                selfieService.getSelfieById(selfieId);
 
-        return ResponseEntity.ok(new BaseResponseDTO1<>("200", "Farmer selfie fetched successfully", response));
+        // Return OK (200) with response data
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200",
+                        "Farmer selfie fetched successfully",
+                        response
+                )
+        );
     }
 
+
+
     /**
-     * Fetch farmer selfie details using survey ID.
+     * Fetch farmer selfie using selfieId and photoType.
      *
      * Use case:
-     *  - Mobile app wants selfie details while viewing survey
+     * - Same selfieId may contain multiple photo types
+     * - Client explicitly wants a specific photoType
      *
-     * @param surveyId ID of the Employee Farmer Survey
-     * @return         FarmerSelfieResponseDTO linked to the survey
+     * HTTP Method: GET
+     * URL: /api/v1/farmer-selfie/{selfieId}/photo-type/{photoType}
+     */
+    @GetMapping("/{selfieId}/photo-type/{photoType}")
+    public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseDTO>> getBySelfieIdAndPhotoType(
+
+            // Selfie primary identifier
+            @PathVariable Long selfieId,
+
+            // Enum path variable (validated automatically by Spring)
+            @PathVariable PhotoType photoType) {
+
+        // Service fetch with composite condition
+        FarmerSelfieResponseDTO response =
+                selfieService.getSelfieByIdAndPhotoType(selfieId, photoType);
+
+        // Return successful response
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200",
+                        "Farmer selfie fetched successfully by selfieId and photoType",
+                        response
+                )
+        );
+    }
+
+
+    /**
+     * Fetch farmer selfie using surveyId.
+     *
+     * Use case:
+     * - While viewing survey details, display associated selfie
+     *
+     * HTTP Method: GET
+     * URL: /api/v1/farmer-selfie/survey/{surveyId}
      */
     @GetMapping("/survey/{surveyId}")
     public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseDTO>> getBySurveyId(
+
+            // Survey identifier
             @PathVariable Long surveyId) {
-        FarmerSelfieResponseDTO response = selfieService.getSelfieBySurveyId(surveyId);
-        return ResponseEntity.ok(new BaseResponseDTO1<>("200", "Farmer selfie fetched successfully by survey ID", response));
+
+        // Retrieve selfie associated with the survey
+        FarmerSelfieResponseDTO response =
+                selfieService.getSelfieBySurveyId(surveyId);
+
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200",
+                        "Farmer selfie fetched successfully by surveyId",
+                        response
+                )
+        );
+    }
+
+
+
+    /**
+     * Fetch farmer selfie using surveyId and photoType.
+     *
+     * Use case:
+     * - Survey may have multiple selfies
+     * - Client needs a specific selfie angle/type
+     *
+     * HTTP Method: GET
+     * URL: /api/v1/farmer-selfie/survey/{surveyId}/photo-type/{photoType}
+     */
+    @GetMapping("/survey/{surveyId}/photo-type/{photoType}")
+    public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseDTO>> getBySurveyIdAndPhotoType(
+
+            // Survey identifier
+            @PathVariable Long surveyId,
+
+            // Enum representing selfie type
+            @PathVariable PhotoType photoType) {
+
+        // Fetch selfie based on survey + photoType
+        FarmerSelfieResponseDTO response =
+                selfieService.getSelfieBySurveyIdAndPhotoType(surveyId, photoType);
+
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200",
+                        "Farmer selfie fetched successfully by surveyId and photoType",
+                        response
+                )
+        );
     }
 
 
     /**
-     * Update (replace) the farmer selfie image.
+     * Update (replace) selfie image.
      *
      * Notes:
-     *  - This is a PATCH operation because only the image is updated
-     *  - Existing selfie metadata remains unchanged
+     * - Only image is updated
+     * - photoType and survey mapping remain unchanged
+     * - PATCH is used as this is a partial update
      *
-     * @param selfieId ID of the selfie to be updated
-     * @param image    New image file
-     * @return         Updated FarmerSelfieResponseDTO
+     * HTTP Method: PATCH
+     * URL: /api/v1/farmer-selfie/{selfieId}
      */
     @PatchMapping("/{selfieId}")
     public ResponseEntity<BaseResponseDTO1<FarmerSelfieResponseDTO>> updateSelfieImage(
+
+            // Selfie identifier whose image is to be replaced
             @PathVariable Long selfieId,
+
+            // New image file
             @RequestParam MultipartFile image) {
 
-        FarmerSelfieResponseDTO response = selfieService.updateSelfieImage(selfieId, image);
-        return ResponseEntity.ok(new BaseResponseDTO1<>("200", "Farmer selfie image updated successfully", response));
+        // Perform image replacement
+        FarmerSelfieResponseDTO response =
+                selfieService.updateSelfieImage(selfieId, image);
+
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200",
+                        "Farmer selfie image updated successfully",
+                        response
+                )
+        );
     }
+
 }

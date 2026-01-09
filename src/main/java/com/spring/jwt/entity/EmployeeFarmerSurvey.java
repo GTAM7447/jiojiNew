@@ -80,7 +80,7 @@ public class EmployeeFarmerSurvey {
             nullable = false
     )
     private User user;
-
+    @Enumerated(EnumType.STRING)
     private FormStatus formStatus;
 
 

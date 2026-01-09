@@ -10,8 +10,10 @@ public class ProductDTO {
     private Long productId;
     private String productName;
     private Product.ProductType productType;
+    private Product.Category category;
     private Double price;
     private Double offers;
     private Boolean active;
     private List<ProductSectionDTO> sections;
+    private ProductPhotoDTO photoDTO;
 }
