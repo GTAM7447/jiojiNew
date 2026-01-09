@@ -1,5 +1,6 @@
 package com.spring.jwt.service.impl;
 
+import com.spring.jwt.Employee.EmployeeRepository;
 import com.spring.jwt.dto.*;
 import com.spring.jwt.entity.*;
 import com.spring.jwt.exception.BaseException;
@@ -48,6 +49,8 @@ public class UserServiceImpl implements UserService
 
     private final UserMapper userMapper;
 
+    private final EmployeeRepository employeeRepository;
+
 //    @Value("${app.url.password-reset}")
 //    private String passwordResetUrl;
 @Value("${app.url.password-reset:http://localhost:3000/reset-password}")
@@ -78,39 +81,105 @@ private String passwordResetUrl;
     }
 
     @Transactional
-    private User insertUser(UserDTO userDTO)
-    {
-        Optional<EmailVerification> emailVerificationOpt = emailVerificationRepo.findByEmail(userDTO.getEmail());
-//
-//        if (emailVerificationOpt.isEmpty() ||
-//                EmailVerification.STATUS_NOT_VERIFIED.equals(emailVerificationOpt.get().getStatus())) {
-//            throw new EmailNotVerifiedException("Email not verified");
-//        }
+    private User insertUser(UserDTO userDTO) {
 
         User user = new User();
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setEmailVerified(true);
 
-        Set<Role> roles = new HashSet<>();
 
-        Role defaultRole = roleRepository.findByName("USER");
-        if (defaultRole != null) {
-            roles.add(defaultRole);
-            log.info("Assigned default USER role to new user: {}", userDTO.getEmail());
-        } else {
-            log.error("Default USER role not found in database");
-            throw new BaseException(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), 
-                "System configuration error: Default role not found");
+        String roleName = (userDTO.getRole() == null || userDTO.getRole().isBlank())
+                ? "USER"
+                : userDTO.getRole().toUpperCase();
+
+        if ("ADMIN".equals(roleName)) {
+            throw new BaseException("401","ADMIN role cannot be assigned");
         }
 
-        user.setRoles(roles);
+        Role role = roleRepository.findByName(roleName);
+        if (role == null) {
+            throw new BaseException("400", "Invalid role: " + roleName);
+        }
 
+        user.setRoles(Set.of(role));
         user = userRepository.save(user);
+
+
+        if ("SURVEYOR".equals(roleName) || "LAB_TECHNICIAN".equals(roleName)) {
+            createEmployee(user, userDTO);
+        }
 
         return user;
     }
+    @Transactional
+    private void createEmployee(User user, UserDTO dto) {
+
+        Employee employee = new Employee();
+        employee.setUser(user);
+
+        employee.setEmployeeCode(
+                dto.getEmployeeCode() != null
+                        ? dto.getEmployeeCode()
+                        : "J_EMP-" + user.getId()
+        );
+
+        employee.setCompanyName(dto.getCompanyName());
+        employee.setAddress(dto.getAddress());
+        employee.setPermanentAddress(dto.getPermanentAddress());
+        employee.setCity(dto.getCity());
+        employee.setDistrict(dto.getDistrict());
+        employee.setState(dto.getState());
+        employee.setAccountNumber(dto.getAccountNumber());
+        employee.setIfscCode(dto.getIfscCode());
+        employee.setPfNumber(dto.getPfNumber());
+        employee.setInsuranceNumber(dto.getInsuranceNumber());
+        employee.setPanNumber(dto.getPanNumber());
+        employee.setVehicleNumber(dto.getVehicleNumber());
+        employee.setDescription(dto.getDescription());
+
+        employeeRepository.save(employee);
+        log.info("Created EMP profile for user ID: {}", user.getId());
+    }
+
+
+//    @Transactional
+//    private User insertUser(UserDTO userDTO)
+//    {
+//        Optional<EmailVerification> emailVerificationOpt = emailVerificationRepo.findByEmail(userDTO.getEmail());
+////
+////        if (emailVerificationOpt.isEmpty() ||
+////                EmailVerification.STATUS_NOT_VERIFIED.equals(emailVerificationOpt.get().getStatus())) {
+////            throw new EmailNotVerifiedException("Email not verified");
+////        }
+//
+//        User user = new User();
+//        user.setEmail(userDTO.getEmail());
+//        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+//        user.setMobileNumber(userDTO.getMobileNumber());
+//        user.setEmailVerified(true);
+//
+//        Set<Role> roles = new HashSet<>();
+//
+//        Role defaultRole = roleRepository.findByName("USER");
+//        if (defaultRole != null) {
+//            roles.add(defaultRole);
+//            log.info("Assigned default USER role to new user: {}", userDTO.getEmail());
+//        } else {
+//            log.error("Default USER role not found in database");
+//            throw new BaseException(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+//                "System configuration error: Default role not found");
+//        }
+//
+//        user.setRoles(roles);
+//
+//        user = userRepository.save(user);
+//
+//        return user;
+//    }
 
     private void createAdminProfile(User user, UserDTO userDTO)
     {

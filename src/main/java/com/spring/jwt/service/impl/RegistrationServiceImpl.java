@@ -47,22 +47,40 @@ public class RegistrationServiceImpl implements SecureAuthenticationService {
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final int ACCOUNT_LOCK_DURATION_MINUTES = 30;
 
-    @Override
-    @Transactional
-    public BaseResponseDTO registerUser(SecureUserRegistrationRequest request, HttpServletRequest httpRequest)
-    {
-        log.info("Starting user registration for email: {}", DataMaskingUtils.maskEmail(request.getEmail()));
+//    @Override
+//    @Transactional
+//    public BaseResponseDTO registerUser(SecureUserRegistrationRequest request, HttpServletRequest httpRequest)
+//    {
+//        log.info("Starting user registration for email: {}", DataMaskingUtils.maskEmail(request.getEmail()));
+//
+//        return executeRegistration(
+//            () -> {
+//                validationService.validateUserRegistration(request);
+//                checkEmailAndMobileAvailability(request.getEmail(), request.getMobileNumber());
+//                return userFactory.createUser(request, httpRequest);
+//            },
+//            "USER",
+//            "User registered successfully"
+//        );
+//    }
+@Override
+@Transactional
+public BaseResponseDTO registerUser(
+        SecureUserRegistrationRequest request,
+        HttpServletRequest httpRequest) {
 
-        return executeRegistration(
+    return executeRegistration1(
             () -> {
                 validationService.validateUserRegistration(request);
-                checkEmailAndMobileAvailability(request.getEmail(), request.getMobileNumber());
+                checkEmailAndMobileAvailability(
+                        request.getEmail(),
+                        request.getMobileNumber()
+                );
                 return userFactory.createUser(request, httpRequest);
             },
-            "USER",
             "User registered successfully"
-        );
-    }
+    );
+}
 
     @Override
     @Transactional
@@ -146,21 +164,36 @@ public class RegistrationServiceImpl implements SecureAuthenticationService {
     {
         try {
             User user = userCreator.get();
-            assignRole(user, roleName);
+//            assignRole(user, roleName);
             User savedUser = userRepository.save(user);
-            
+
             log.info("{} registered successfully with ID: {}", roleName.toLowerCase(), savedUser.getUser_id());
-            
+
             return createSuccessResponse(HttpStatus.CREATED, successMessage, Long.valueOf(savedUser.getUser_id()));
-            
+
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
             log.error("Error during {} registration: {}", roleName.toLowerCase(), e.getMessage(), e);
-            throw new BaseException(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), 
+            throw new BaseException(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),
                 "Registration failed. Please try again.");
         }
     }
+    private BaseResponseDTO executeRegistration1(
+            Supplier<User> userCreator,
+            String successMessage) {
+
+        User savedUser = userCreator.get(); // already saved inside factory
+
+        log.info("User registered successfully with ID: {}", savedUser.getUser_id());
+
+        return createSuccessResponse(
+                HttpStatus.CREATED,
+                successMessage,
+                savedUser.getUser_id()
+        );
+    }
+
 
     private void checkEmailAndMobileAvailability(String email, Long mobileNumber) {
         checkEmailAvailability(email);

@@ -1,4 +1,3 @@
-
 package com.spring.jwt.dto;
 
 import com.spring.jwt.entity.Role;
@@ -16,26 +15,48 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class UserDTO {
 
+    /* ===================== USER FIELDS ===================== */
+
     @Schema(description = "userId of User", example = "10011")
     private Long userId;
 
     @Schema(description = "Email of User", example = "example@example.com")
     private String email;
 
-    @Schema(description = "Mobile Number of the customer", example = "9822222212")
+    @Schema(description = "Mobile Number", example = "9822222212")
     private Long mobileNumber;
 
-    @Schema(description = "Password to create an account", example = "Pass@1234")
+    @Schema(description = "Password", example = "Pass@1234")
     private String password;
-    private Set<String> roles;
 
-    private String role;
     private String firstName;
     private String lastName;
 
+    private String role;
+    private Set<String> roles;
+
+    //EMPLOYEE FIELDS
+
+    private String employeeCode;
+    private String companyName;
+    private String address;
+    private String permanentAddress;
+    private String city;
+    private String district;
+    private String state;
+    private String accountNumber;
+    private String ifscCode;
+    private String pfNumber;
+    private String insuranceNumber;
+    private String panNumber;
+    private String vehicleNumber;
+    private String description;
+
+
     public UserDTO(User user) {
-        this.mobileNumber = user.getMobileNumber();
         this.userId = user.getUser_id();
+        this.email = user.getEmail();
+        this.mobileNumber = user.getMobileNumber();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
 
@@ -47,24 +68,7 @@ public class UserDTO {
     }
 
     public static UserDTO fromEntity(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        UserDTO dto = new UserDTO();
-        dto.setEmail(user.getEmail());
-        dto.setMobileNumber(user.getMobileNumber());
-        // dto.setFirstName(user.getFirstName());
-        // dto.setLastName(user.getLastName());
-        // dto.setAddress(user.getAddress());
-        dto.setUserId(user.getUser_id());
-
-        if (user.getRoles() != null) {
-            dto.setRoles(user.getRoles().stream()
-                    .map(Role::getName)
-                    .collect(Collectors.toSet()));
-        }
-
-        return dto;
+        if (user == null) return null;
+        return new UserDTO(user);
     }
 }
