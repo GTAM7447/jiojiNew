@@ -2,8 +2,13 @@ package com.spring.jwt.Product;
 
 
 import com.spring.jwt.EmployeeFarmerSurvey.BaseResponseDTO1;
+import com.spring.jwt.entity.Product;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +64,38 @@ public class ProductController {
                         String.valueOf(HttpStatus.OK.value()),
                         "Products fetched successfully",
                         result
+                )
+        );
+    }
+
+    @GetMapping("/type/{productType}")
+    public ResponseEntity<BaseResponseDTO1<Page<ProductDTO>>> getAllByProductType(
+            @PathVariable Product.ProductType productType,
+            @PageableDefault(
+                    page = 0, size = 10,sort = "productId",direction = Sort.Direction.DESC
+            ) Pageable pageable
+            ){
+        Page<ProductDTO> page = productService.getAllByProductType(productType, pageable);
+
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>("200", "Products fetched successfully", page)
+        );
+    }
+
+    @GetMapping("/filer")
+    public ResponseEntity<BaseResponseDTO1<Page<ProductDTO>>> getAllByProductTypeAndCategory(
+            @RequestParam Product.ProductType productType,
+            @RequestParam Product.Category category,
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    direction = Sort.Direction.DESC
+            )Pageable pageable
+    ){
+        Page<ProductDTO> page = productService.getAllByProductTypeAndCategory(productType, category, pageable);
+        return ResponseEntity.ok(
+                new BaseResponseDTO1<>(
+                        "200", "Products fetched successfully", page
                 )
         );
     }

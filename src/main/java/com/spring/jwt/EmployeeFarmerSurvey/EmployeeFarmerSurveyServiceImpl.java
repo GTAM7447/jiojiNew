@@ -44,12 +44,13 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
         }
         String formNumber = generateFormNumber();
         EmployeeFarmerSurvey survey = surveyMapper.toEntityReg(dto, user);
+        survey.setFormStatus(FormStatus.INACTIVE);
         survey.setFormNumber(formNumber);
         survey.setUser(user);
-        survey.setFormStatus(FormStatus.NOTACTIVE);
         EmployeeFarmerSurvey savedSurvey = employeeFarmerSurveyRepository.save(survey);
         return surveyMapper.toDto(savedSurvey);
     }
+
 
 
 

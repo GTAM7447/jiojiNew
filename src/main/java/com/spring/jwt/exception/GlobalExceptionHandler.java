@@ -176,4 +176,20 @@ public class GlobalExceptionHandler {
 
         return HttpStatus.BAD_REQUEST;
     }
+
+    @ExceptionHandler(DocumentAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDocumentAlreadyExistsException(
+            DocumentAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        log.error("Duplicate document: {}", ex.getMessage());
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "RESOURCE_ALREADY_EXISTS",
+                ex.getMessage(),
+                request
+        );
+    }
+
 }

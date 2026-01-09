@@ -1,5 +1,6 @@
 package com.spring.jwt.entity;
 
+import com.spring.jwt.Enums.ImageType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ public class ProductImage {
     private Product product;
 
     private String imageUrl;
+
+    private ImageType imageType;
 
     private LocalDateTime uploadedAt = LocalDateTime.now();
 }

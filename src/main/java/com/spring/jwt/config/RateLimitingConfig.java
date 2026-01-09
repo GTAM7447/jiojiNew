@@ -15,13 +15,13 @@ public class RateLimitingConfig {
     @Value("${app.rate-limiting.enabled:true}")
     private boolean rateLimitingEnabled;
 
-    @Value("${app.rate-limiting.limit-for-period:20}")
+    @Value("${app.rate-limiting.limit-for-period:200}")
     private int limitForPeriod;
 
-    @Value("${app.rate-limiting.refresh-period:60}")
+    @Value("${app.rate-limiting.refresh-period:600}")
     private int refreshPeriod;
 
-    @Value("${app.rate-limiting.timeout-duration:300}")
+    @Value("${app.rate-limiting.timeout-duration:3000}")
     private int timeoutDuration;
 
     @Bean

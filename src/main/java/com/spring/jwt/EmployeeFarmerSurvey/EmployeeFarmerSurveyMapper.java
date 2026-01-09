@@ -43,9 +43,11 @@ public class EmployeeFarmerSurveyMapper {
         survey.setLivestockDetails(dto.getLivestockDetails());
         survey.setProductionEquipment(dto.getProductionEquipment());
         survey.setSampleCollected(dto.getSampleCollected());
+        survey.setUser(user);
 
         return survey;
     }
+
     public EmployeeFarmerSurveyDTO toDto(EmployeeFarmerSurvey survey) {
 
         EmployeeFarmerSurveyDTO dto = new EmployeeFarmerSurveyDTO();
@@ -63,6 +65,7 @@ public class EmployeeFarmerSurveyMapper {
         dto.setLivestockDetails(survey.getLivestockDetails());
         dto.setProductionEquipment(survey.getProductionEquipment());
         dto.setSampleCollected(survey.getSampleCollected());
+        dto.setFormStatus(survey.getFormStatus());
 
         if (survey.getUser() != null) {
             dto.setUserId(survey.getUser().getId());
@@ -113,5 +116,4 @@ public class EmployeeFarmerSurveyMapper {
             survey.setUser(user);
         }
     }
-
 }
