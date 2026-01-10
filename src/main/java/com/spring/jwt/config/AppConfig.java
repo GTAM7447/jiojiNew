@@ -33,6 +33,8 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
 import com.spring.jwt.exception.SecurityExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -187,6 +189,10 @@ public class AppConfig {
                 .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
                 .requestMatchers("/api/v1/lab_report/**").permitAll()
                 .requestMatchers("/api/v1/products/**").permitAll()
+                .requestMatchers("api/v1/company-weekly-off/**").permitAll()
+                .requestMatchers("/api/v1/attendance/**").permitAll()
+                .requestMatchers("/api/v1/product-photo/**").permitAll()
+                .requestMatchers("/api/v1/employees/**").permitAll()
 
                 .anyRequest().authenticated());
 
