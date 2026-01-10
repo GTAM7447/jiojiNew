@@ -95,7 +95,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     public EmployeeFarmerSurveyDTO updateSurvey(Long surveyId,EmployeeFarmerSurveyDTO dto) {
         Long loggedInUserId = securityUtil.getCurrentUserId();
         EmployeeFarmerSurvey existingSurvey = employeeFarmerSurveyRepository.findById(surveyId).orElseThrow(() -> new UserNotFoundExceptions("Survey not found with ID: " + surveyId));
-        if (!existingSurvey.getUser().getId().equals(loggedInUserId)) {
+        if (!existingSurvey.getUser().getUserId().equals(loggedInUserId)) {
             throw new UserNotFoundExceptions("You are not authorized to update this survey");
         }
         User user = null;
@@ -120,7 +120,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     public Page<EmployeeFarmerSurveyDTO> getByUserIdSurveys(Long userId, Pageable pageable) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundExceptions("User not found with ID: " + userId);}
-        Page<EmployeeFarmerSurvey> page = employeeFarmerSurveyRepository.findByUserId(userId, pageable);
+        Page<EmployeeFarmerSurvey> page = employeeFarmerSurveyRepository.findByUser_UserId(userId, pageable);
         if (pageable.getPageNumber() >= page.getTotalPages()
                 && page.getTotalPages() > 0) {
             throw new UserNotFoundExceptions("Page not found. Requested page: " + pageable.getPageNumber());
@@ -135,7 +135,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundExceptions("User not found with ID: " + userId);
         }
-        Page<EmployeeFarmerSurvey> page = employeeFarmerSurveyRepository.findByUserId(userId, pageable);
+        Page<EmployeeFarmerSurvey> page = employeeFarmerSurveyRepository.findByUser_UserId(userId, pageable);
         if (pageable.getPageNumber() >= page.getTotalPages()
                 && page.getTotalPages() > 0) {
             throw new UserNotFoundExceptions(
@@ -145,6 +145,67 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
         return page.map(surveyMapper::toDto);
     }
 
+    @Override
+    public SurveyStatusCountDTO getAllSurveyStatusCount() {
+
+        long completed =
+                employeeFarmerSurveyRepository.countByFormStatus(FormStatus.ACTIVE);
+
+        long pending =
+                employeeFarmerSurveyRepository.countByFormStatus(FormStatus.INACTIVE);
+
+        return new SurveyStatusCountDTO(pending, completed);
+    }
+
+
+    @Override
+    public SurveyStatusCountDTO getSurveyStatusCountByLoggedInUser() {
+
+        Long userId = securityUtil.getCurrentUserId();
+
+        long completed =
+                employeeFarmerSurveyRepository.countByFormStatusAndUser_UserId(
+                        FormStatus.ACTIVE, userId);
+
+        long pending =
+                employeeFarmerSurveyRepository.countByFormStatusAndUser_UserId(
+                        FormStatus.INACTIVE, userId);
+
+        return new SurveyStatusCountDTO(pending, completed);
+    }
+    @Override
+    public Page<EmployeeFarmerSurveyDTO> getAllSurveysByStatus(
+            FormStatus status, Pageable pageable) {
+
+        Page<EmployeeFarmerSurvey> page =
+                employeeFarmerSurveyRepository.findByFormStatus(status, pageable);
+
+        if (page.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "No surveys found with status: " + status);
+        }
+
+        return page.map(surveyMapper::toDto);
+    }
+
+    @Override
+    public Page<EmployeeFarmerSurveyDTO> getMySurveysByStatus(
+            FormStatus status, Pageable pageable) {
+
+        Long userId = securityUtil.getCurrentUserId();
+
+        Page<EmployeeFarmerSurvey> page =
+                employeeFarmerSurveyRepository.findByFormStatusAndUser_UserId(
+                        status, userId, pageable);
+
+        if (page.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "No surveys found for userId "
+                            + userId + " with status: " + status);
+        }
+
+        return page.map(surveyMapper::toDto);
+    }
 
     private String generateFormNumber() {
 

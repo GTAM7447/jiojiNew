@@ -25,7 +25,7 @@ public class UserMapper {
         try {
             UserDTO dto = new UserDTO();
             dto.setEmail(user.getEmail());
-            dto.setUserId(user.getUser_id());
+            dto.setUserId(user.getUserId());
             dto.setFirstName(user.getFirstName());
             dto.setLastName(user.getLastName());
             if (user.getRoles() != null) {

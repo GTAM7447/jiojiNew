@@ -55,7 +55,7 @@ public class UserDetailsServiceCustom implements UserDetailsService {
         String firstName = null;
         Long userId = null;
         Integer userProfileId = null;
-        userId = user.getUser_id();
+        userId = user.getUserId();
 
 
         return new UserDetailsCustom(

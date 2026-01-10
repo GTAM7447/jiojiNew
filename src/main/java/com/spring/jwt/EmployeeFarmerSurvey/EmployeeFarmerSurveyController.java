@@ -1,5 +1,6 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
+import com.spring.jwt.Enums.FormStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -162,5 +163,40 @@ public class EmployeeFarmerSurveyController {
         Page<EmployeeFarmerSurveyDTO> page = employeeFarmerSurveyService.getMySurveys(pageable);
 
         return ResponseEntity.ok(new BaseResponseDTO1<>("200", "My surveys fetched successfully", page));
+    }
+
+    @GetMapping("/status-count/all")
+    public ResponseEntity<SurveyStatusCountDTO> getAllStatusCount() {
+        return ResponseEntity.ok(
+                employeeFarmerSurveyService.getAllSurveyStatusCount()
+        );
+    }
+
+    @GetMapping("/status-count/me")
+    public ResponseEntity<SurveyStatusCountDTO> getMyStatusCount() {
+        return ResponseEntity.ok(
+                employeeFarmerSurveyService.getSurveyStatusCountByLoggedInUser()
+        );
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<Page<EmployeeFarmerSurveyDTO>> getAllByStatus(
+            @PathVariable FormStatus status,
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                employeeFarmerSurveyService.getAllSurveysByStatus(status, pageable)
+        );
+    }
+
+
+    @GetMapping("/me/status/{status}")
+    public ResponseEntity<Page<EmployeeFarmerSurveyDTO>> getMyByStatus(
+            @PathVariable FormStatus status,
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                employeeFarmerSurveyService.getMySurveysByStatus(status, pageable)
+        );
     }
 }

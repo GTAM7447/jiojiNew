@@ -196,7 +196,7 @@ public class UserFactory {
         employee.setEmployeeCode(
                 request.getEmployeeCode() != null
                         ? request.getEmployeeCode()
-                        : "EMP-" + user.getId()
+                        : "EMP-" + user.getUserId()
         );
 
         employee.setCompanyName(request.getCompanyName());

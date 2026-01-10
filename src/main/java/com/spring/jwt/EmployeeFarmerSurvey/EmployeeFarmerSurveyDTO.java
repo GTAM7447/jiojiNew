@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -45,6 +46,10 @@ public class EmployeeFarmerSurveyDTO {
     )
     @Schema(description = "Total land area owned by farmer (in Acres)", example = "2.5")
     private String landArea;
+
+    @NotBlank(message = "village is required")
+    @Schema(description = "Farmer village", example = "Nashik")
+    private String village;
 
     @NotBlank(message = "Address is required")
     @Schema(description = "Farmer address", example = "Village Mulshi, Pune")
@@ -90,4 +95,6 @@ public class EmployeeFarmerSurveyDTO {
     private FormStatus formStatus;
 
     private FarmerSelfieDTO farmerSelfie;
+
+    private LocalDateTime createdAt;
 }

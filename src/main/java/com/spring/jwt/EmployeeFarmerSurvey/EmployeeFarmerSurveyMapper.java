@@ -23,6 +23,7 @@ public class EmployeeFarmerSurveyMapper {
         survey.setLivestockDetails(dto.getLivestockDetails());
         survey.setProductionEquipment(dto.getProductionEquipment());
         survey.setSampleCollected(dto.getSampleCollected());
+        survey.setVillage(dto.getVillage());
         survey.setUser(user);
 
         return survey;
@@ -43,6 +44,7 @@ public class EmployeeFarmerSurveyMapper {
         survey.setLivestockDetails(dto.getLivestockDetails());
         survey.setProductionEquipment(dto.getProductionEquipment());
         survey.setSampleCollected(dto.getSampleCollected());
+        survey.setVillage(dto.getVillage());
         survey.setUser(user);
 
         return survey;
@@ -66,9 +68,11 @@ public class EmployeeFarmerSurveyMapper {
         dto.setProductionEquipment(survey.getProductionEquipment());
         dto.setSampleCollected(survey.getSampleCollected());
         dto.setFormStatus(survey.getFormStatus());
+        dto.setVillage(survey.getVillage());
+        dto.setCreatedAt(survey.getCreatedAt());
 
         if (survey.getUser() != null) {
-            dto.setUserId(survey.getUser().getId());
+            dto.setUserId(survey.getUser().getUserId());
         }
 
         return dto;
@@ -110,6 +114,9 @@ public class EmployeeFarmerSurveyMapper {
         }
         if (dto.getSampleCollected() != null) {
             survey.setSampleCollected(dto.getSampleCollected());
+        }
+        if (dto.getVillage() != null) {
+            survey.setVillage(dto.getVillage());
         }
 
         if (user != null) {

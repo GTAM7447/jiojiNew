@@ -33,7 +33,7 @@ public class EmployeeMapper {
 
         EmployeeResponseDTO dto = new EmployeeResponseDTO();
         dto.setEmployeeId(emp.getEmployeeId());
-        dto.setUserId(emp.getUser().getId());
+        dto.setUserId(emp.getUser().getUserId());
         dto.setUserEmail(emp.getUser().getEmail());
         dto.setUserMobile(emp.getUser().getMobileNumber());
         dto.setEmployeeCode(emp.getEmployeeCode());
