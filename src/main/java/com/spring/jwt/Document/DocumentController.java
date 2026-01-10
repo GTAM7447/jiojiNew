@@ -72,6 +72,42 @@ public class DocumentController
                                 .body(ApiResponse.success("Document uploaded successfully", response));
         }
 
+        @Operation(summary = "Upload a document", description = "Upload a document file with automatic compression and validation. Supports PDF, JPEG, PNG, and WEBP formats up to 15MB.")
+        @ApiResponses(value =
+                {
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201",
+                                description = "Document uploaded successfully"),
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400",
+                                description = "Invalid file or parameters"),
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "413",
+                                description = "File size exceeds limit"),
+                        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401",
+                                description = "Unauthorized")
+                })
+        @PostMapping(value = "/uploadByUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<ApiResponse<DocumentResponseDTO>> uploadDocumentUserId
+                (
+                        @Parameter(description = "Document file to upload", required = true)
+                        @RequestParam("file") MultipartFile file,
+                        @Parameter(description = "Type of document being uploaded", required = true)
+                        @RequestParam("documentType") DocumentType documentType,
+                        @Parameter(description = "Optional description for the document")
+                        @RequestParam(value = "description", required = false) String description,
+                        @Parameter(description = "userId")
+                        @RequestParam("UserId") Long userId
+                )
+        {
+
+//                Long userId = SecurityUtil.getCurrentUserId();
+                log.info("Upload request: user={}, type={}, file={}, size={}KB",
+                        userId, documentType, file.getOriginalFilename(), file.getSize() / 1024);
+
+                DocumentResponseDTO response = documentService.uploadDocument(userId, file, documentType, description);
+
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(ApiResponse.success("Document uploaded successfully", response));
+        }
+
         /**
          * Replace existing document of the same type or create new
          *
