@@ -71,7 +71,7 @@ private String passwordResetUrl;
             userRepository.save(user);
             response.setCode(String.valueOf(HttpStatus.OK.value()));
             response.setMessage("Account Created Successfully !!");
-            response.setUserID(user.getUser_id());
+            response.setUserID(user.getUserId());
         } catch (Exception e) {
             log.error("Error creating account", e);
             response.setCode(String.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()));
@@ -124,7 +124,7 @@ private String passwordResetUrl;
         employee.setEmployeeCode(
                 dto.getEmployeeCode() != null
                         ? dto.getEmployeeCode()
-                        : "J_EMP-" + user.getId()
+                        : "J_EMP-" + user.getUserId()
         );
 
         employee.setCompanyName(dto.getCompanyName());
@@ -142,7 +142,7 @@ private String passwordResetUrl;
         employee.setDescription(dto.getDescription());
 
         employeeRepository.save(employee);
-        log.info("Created EMP profile for user ID: {}", user.getId());
+        log.info("Created EMP profile for user ID: {}", user.getUserId());
     }
 
 
@@ -388,7 +388,7 @@ private String passwordResetUrl;
 
         userDTO.setRoles(roles);
 
-        Integer userId = user.getUser_id().intValue();
+        Integer userId = user.getUserId().intValue();
 
         return userDTO;
     }

@@ -22,15 +22,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name = "user_seq", sequenceName = "user_sequence", allocationSize = 1, initialValue = 10000)
     @Column(name = "user_id")
-    private Long user_id;
+    private Long userId;
 
-    public Long getId() {
-        return user_id;
-    }
-
-    public void setId(Long id) {
-        this.user_id = id;
-    }
 
     @NotBlank(message = "Email cannot be blank")
     @Email
@@ -44,7 +37,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "completeProfile")
+    @Column(name = "status")
     private Boolean status;
 
     @Column(name = "reset_password_token")

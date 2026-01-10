@@ -118,7 +118,7 @@ public BaseResponseDTO registerUser(
         
         log.info("User authenticated successfully: {}", DataMaskingUtils.maskEmail(request.getEmail()));
         
-        return createSuccessResponse(HttpStatus.OK, "Authentication successful", user.getUser_id());
+        return createSuccessResponse(HttpStatus.OK, "Authentication successful", user.getUserId());
     }
 
     @Override
@@ -167,9 +167,9 @@ public BaseResponseDTO registerUser(
 //            assignRole(user, roleName);
             User savedUser = userRepository.save(user);
 
-            log.info("{} registered successfully with ID: {}", roleName.toLowerCase(), savedUser.getUser_id());
+            log.info("{} registered successfully with ID: {}", roleName.toLowerCase(), savedUser.getUserId());
 
-            return createSuccessResponse(HttpStatus.CREATED, successMessage, Long.valueOf(savedUser.getUser_id()));
+            return createSuccessResponse(HttpStatus.CREATED, successMessage, Long.valueOf(savedUser.getUserId()));
 
         } catch (BaseException e) {
             throw e;
@@ -185,12 +185,12 @@ public BaseResponseDTO registerUser(
 
         User savedUser = userCreator.get(); // already saved inside factory
 
-        log.info("User registered successfully with ID: {}", savedUser.getUser_id());
+        log.info("User registered successfully with ID: {}", savedUser.getUserId());
 
         return createSuccessResponse(
                 HttpStatus.CREATED,
                 successMessage,
-                savedUser.getUser_id()
+                savedUser.getUserId()
         );
     }
 

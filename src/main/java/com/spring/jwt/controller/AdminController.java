@@ -170,7 +170,7 @@ public class AdminController {
     // Helper
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setUserId(user.getUser_id());
+        dto.setUserId(user.getUserId());
         dto.setEmail(user.getEmail());
         dto.setMobileNumber(user.getMobileNumber());
         dto.setFirstName(user.getFirstName());

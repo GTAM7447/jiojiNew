@@ -50,7 +50,7 @@ public class DocumentMetadata {
                 .description(document.getDescription())
                 .fileSize(document.getFileSize())
                 .contentType(document.getContentType())
-                .userId(document.getUser().getUser_id())
+                .userId(document.getUser().getUserId())
                 .uploadedAt(document.getUploadedAt())
                 .updatedAt(document.getUpdatedAt())
                 .build();

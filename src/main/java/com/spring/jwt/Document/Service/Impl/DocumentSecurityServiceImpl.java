@@ -54,7 +54,7 @@ public class DocumentSecurityServiceImpl implements DocumentSecurityService {
 
         try {
             Document document = findDocumentById(documentId);
-            boolean canAccess = document.getUser().getUser_id().equals(userId);
+            boolean canAccess = document.getUser().getUserId().equals(userId);
 
             if (!canAccess) {
                 log.warn("Access denied: Document {} does not belong to user {}", documentId, userId);

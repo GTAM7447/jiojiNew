@@ -3,6 +3,7 @@ package com.spring.jwt.entity;
 import com.spring.jwt.Enums.FormStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +35,9 @@ public class EmployeeFarmerSurvey {
 
     @Column(nullable = false)
     private String landArea;
+
+    @Column(columnDefinition = "TEXT")
+    private String village;
 
     @Column(columnDefinition = "TEXT")
     private String address;
@@ -82,8 +86,7 @@ public class EmployeeFarmerSurvey {
     private User user;
     @Enumerated(EnumType.STRING)
     private FormStatus formStatus;
-
-
-
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 }

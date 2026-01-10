@@ -1,5 +1,6 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
+import com.spring.jwt.Enums.FormStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,5 +22,11 @@ public interface EmployeeFarmerSurveyService {
 
     Page<EmployeeFarmerSurveyDTO> getMySurveys(Pageable pageable);
 
+    SurveyStatusCountDTO getAllSurveyStatusCount();
 
+    SurveyStatusCountDTO getSurveyStatusCountByLoggedInUser();
+
+    Page<EmployeeFarmerSurveyDTO> getAllSurveysByStatus(FormStatus status, Pageable pageable);
+
+    Page<EmployeeFarmerSurveyDTO> getMySurveysByStatus(FormStatus status, Pageable pageable);
 }
