@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -117,17 +118,29 @@ public class AppConfig {
         log.debug("Configuring security filter chain");
         AuthenticationManager authManager = authenticationManager(http);
 
-        http.csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers(
-                        "/api/**",
-                        "/user/**",
-                        "/api/users/**",
-
-                        jwtConfig.getUrl(),
-                        jwtConfig.getRefreshUrl()
+//        http.csrf(csrf -> csrf
+//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                .ignoringRequestMatchers(
+//                        "/api/**",
+//                        "/user/**",
+//                        "/api/users/**",
+//
+//                        jwtConfig.getUrl(),
+//                        jwtConfig.getRefreshUrl()
+//                )
+//        );
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-        );
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+
 
         http.cors(Customizer.withDefaults());
 
@@ -136,14 +149,21 @@ public class AppConfig {
         http.headers(headers -> headers
                 .xssProtection(xss -> xss
                         .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
-                .contentSecurityPolicy(csp -> csp
-                        .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'"))
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                        "default-src 'self'; " +
+                                "script-src 'self' 'unsafe-inline'; " +
+                                "style-src 'self' 'unsafe-inline'; " +
+                                "img-src 'self' data:; " +
+                                "font-src 'self'; " +
+                                "connect-src 'self' https://jiojibackendv1-production.up.railway.app"
+                ))
                 .frameOptions(frame -> frame.deny())
                 .referrerPolicy(referrer -> referrer
                         .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .permissionsPolicy(permissions -> permissions
                         .policy("camera=(), microphone=(), geolocation=()"))
         );
+
 
         log.debug("Configuring URL-based security rules");
         http.authorizeHttpRequests(authorize -> authorize
