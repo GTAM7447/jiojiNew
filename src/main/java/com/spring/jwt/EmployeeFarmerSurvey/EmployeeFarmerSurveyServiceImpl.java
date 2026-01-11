@@ -1,8 +1,10 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
 import com.spring.jwt.Enums.FormStatus;
+import com.spring.jwt.FarmerLabReport.FarmerLabReportRepository;
 import com.spring.jwt.FarmerSelfieEmployeeFarmerSurvey.FarmerSelfieEmployeeFarmerSurveyRepository;
 import com.spring.jwt.entity.EmployeeFarmerSurvey;
+import com.spring.jwt.entity.FarmerSelfieEmployeeFarmerSurvey;
 import com.spring.jwt.entity.User;
 import com.spring.jwt.exception.ResourceNotFoundException;
 import com.spring.jwt.exception.UserAlreadyExistException;
@@ -31,7 +33,7 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     private final EmployeeFarmerSurveyMapper surveyMapper;
     private final SecurityUtil securityUtil;
     private final FarmerSelfieEmployeeFarmerSurveyRepository selfieRepository;
-
+    private final FarmerLabReportRepository farmerLabReportRepository;
 
     @Override
     @Transactional
@@ -111,6 +113,8 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
     public void deleteSurvey(Long surveyId) {
 
         EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId).orElseThrow(() -> new UserNotFoundExceptions("Survey not found with ID: " + surveyId));
+        selfieRepository.deleteBySurveyId(surveyId);
+        farmerLabReportRepository.deleteBySurveyId(surveyId);
         employeeFarmerSurveyRepository.delete(survey);
         log.info("Survey deleted successfully with ID: {}", surveyId);
     }
