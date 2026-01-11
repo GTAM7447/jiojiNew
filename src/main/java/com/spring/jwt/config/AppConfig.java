@@ -114,58 +114,43 @@ public class AppConfig {
         return new ForwardedHeaderFilter();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .requestMatchers(HttpMethod.OPTIONS, "/**");
-    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.debug("Configuring security filter chain");
         AuthenticationManager authManager = authenticationManager(http);
+        http.csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers(
+                        "/api/**",
+                        "/user/**",
+                        "/api/users/**",
 
-//        http.csrf(csrf -> csrf
-//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                .ignoringRequestMatchers(
-//                        "/api/**",
-//                        "/user/**",
-//                        "/api/users/**",
-//
-//                        jwtConfig.getUrl(),
-//                        jwtConfig.getRefreshUrl()
-//                )
-//        );
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        jwtConfig.getUrl(),
+                        jwtConfig.getRefreshUrl()
                 )
+        );
 
-                /* ================= HEADERS ================= */
-                .headers(headers -> headers
-                        .xssProtection(xss -> xss
-                                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
-                        .contentSecurityPolicy(csp -> csp.policyDirectives(
-                                "default-src 'self'; " +
-                                        "script-src 'self' 'unsafe-inline'; " +
-                                        "style-src 'self' 'unsafe-inline'; " +
-                                        "img-src 'self' data:; " +
-                                        "font-src 'self'; " +
-                                        "connect-src 'self' https://jiojibackendv1-production.up.railway.app"
-                        ))
-                        .frameOptions(frame -> frame.deny())
-                        .referrerPolicy(referrer -> referrer
-                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                        .permissionsPolicy(permissions -> permissions
-                                .policy("camera=(), microphone=(), geolocation=()"))
-                );
+        http.cors(Customizer.withDefaults());
+
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        http.headers(headers -> headers
+                .xssProtection(xss -> xss
+                        .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                .contentSecurityPolicy(csp -> csp
+                        .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'"))
+                .frameOptions(frame -> frame.deny())
+                .referrerPolicy(referrer -> referrer
+                        .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .permissionsPolicy(permissions -> permissions
+                        .policy("camera=(), microphone=(), geolocation=()"))
+        );
 
 
         log.debug("Configuring URL-based security rules");
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(jwtConfig.getUrl()).permitAll()
                 .requestMatchers(jwtConfig.getRefreshUrl()).permitAll()
@@ -203,8 +188,7 @@ public class AppConfig {
                 .requestMatchers("/api/v1/documents/**").authenticated()
                 .requestMatchers("/api/v1/employeeFarmerSurveys/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/employeeFarmerSurveys/**")
-                .authenticated()
+                .requestMatchers("/api/v1/employeeFarmerSurveys/**").permitAll()
                 .requestMatchers("/api/v1/**").permitAll()
                 .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
                 .requestMatchers("/api/v1/lab_report/**").permitAll()
