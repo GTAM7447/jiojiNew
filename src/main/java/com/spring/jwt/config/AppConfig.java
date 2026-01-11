@@ -194,9 +194,10 @@ public class AppConfig {
                 .requestMatchers("/user/**").permitAll()
 
                 .requestMatchers("/api/v1/documents/**").authenticated()
-
+                .requestMatchers("/api/v1/employeeFarmerSurveys/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/employeeFarmerSurveys/**")
+                .authenticated()
                 .requestMatchers("/api/v1/**").permitAll()
                 .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
                 .requestMatchers("/api/v1/lab_report/**").permitAll()
