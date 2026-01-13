@@ -35,13 +35,18 @@ public class RateLimitingFilter implements Filter, Ordered {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         
-        if (!rateLimitingEnabled) {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
             chain.doFilter(request, response);
             return;
         }
         
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (!rateLimitingEnabled) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         String path = httpRequest.getRequestURI();
         if (isPublicEndpoint(path)) {

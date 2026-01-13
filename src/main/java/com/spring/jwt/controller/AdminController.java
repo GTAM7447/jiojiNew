@@ -31,8 +31,6 @@ public class AdminController {
 //    private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // Employee Management
-
     @PostMapping("/employees")
     public ResponseEntity<BaseResponseDTO> createEmployee(@RequestBody UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()) != null) {
@@ -42,7 +40,7 @@ public class AdminController {
 
         User user = new User();
         user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // password set by admin
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
@@ -51,7 +49,7 @@ public class AdminController {
         user.setStatus(true);
 
         Set<Role> roles = new HashSet<>();
-        // ROle from DTO
+
         String roleName = userDTO.getRole();
         if (roleName != null && !roleName.isEmpty()) {
             Role role = roleRepository.findByName(roleName.toUpperCase());
@@ -74,7 +72,7 @@ public class AdminController {
 
     @GetMapping("/employees")
     public ResponseEntity<List<UserDTO>> getAllEmployees() {
-        // findout where it is lab or surveyer
+
         List<User> users = userRepository.findAll();
         List<UserDTO> employees = users.stream()
                 .filter(u -> u.getRoles().stream()
@@ -99,7 +97,6 @@ public class AdminController {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
 
-        // Update Role if provided
         if (userDTO.getRole() != null) {
             Role role = roleRepository.findByName(userDTO.getRole().toUpperCase());
             if (role != null) {
@@ -118,56 +115,12 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new BaseResponseDTO("404", "User not found", null));
         }
         User user = userOpt.get();
-        user.setStatus(false); // Deactivate
+        user.setStatus(false);
 
         userRepository.save(user);
         return ResponseEntity.ok(new BaseResponseDTO("200", "Employee deactivated successfully", null));
     }
 
-    // Product Management
-
-//    @PostMapping("/products")
-//    public ResponseEntity<BaseResponseDTO> addProduct(@RequestBody Product product) {
-//        product.setCreatedAt(LocalDateTime.now());
-//        productRepository.save(product);
-//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product added successfully", null));
-//    }
-
-//    @PutMapping("/products/{productId}")
-//    public ResponseEntity<BaseResponseDTO> updateProduct(@PathVariable Long productId,
-//            @RequestBody Product productDetails) {
-//        Optional<Product> prodOpt = productRepository.findById(productId);
-//        if (prodOpt.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new BaseResponseDTO("404", "Product not found", null));
-//        }
-//        Product product = prodOpt.get();
-//        product.setProductName(productDetails.getProductName());
-//        product.setProductType(productDetails.getProductType());
-//        product.setDescription(productDetails.getDescription());
-//        product.setPrice(productDetails.getPrice());
-//        product.setActive(productDetails.getActive());
-//
-//        productRepository.save(product);
-//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product updated successfully", null));
-//    }
-
-//    @DeleteMapping("/products/{productId}")
-//    public ResponseEntity<BaseResponseDTO> deleteProduct(@PathVariable Long productId) {
-//        if (!productRepository.existsById(productId)) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                    .body(new BaseResponseDTO("404", "Product not found", null));
-//        }
-//        productRepository.deleteById(productId);
-//        return ResponseEntity.ok(new BaseResponseDTO("200", "Product deleted successfully", null));
-//    }
-//
-//    @GetMapping("/products")
-//    public ResponseEntity<List<Product>> getAllProducts() {
-//        return ResponseEntity.ok(productRepository.findAll());
-//    }
-
-    // Helper
     private UserDTO convertToDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setUserId(user.getUserId());

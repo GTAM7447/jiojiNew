@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class UserDTO {
 
-    /* ===================== USER FIELDS ===================== */
-
     @Schema(description = "userId of User", example = "10011")
     private Long userId;
 
@@ -34,8 +32,6 @@ public class UserDTO {
 
     private String role;
     private Set<String> roles;
-
-    //EMPLOYEE FIELDS
 
     private String employeeCode;
     private String companyName;

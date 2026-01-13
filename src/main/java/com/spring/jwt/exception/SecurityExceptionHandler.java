@@ -142,8 +142,6 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
     {
         String path = request.getRequestURI();
         String method = request.getMethod();
-        
-        // Determine the specific error message based on the endpoint
         String message;
         String details;
         java.util.List<String> suggestedActions;
@@ -224,7 +222,8 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
         if (lowerMessage.contains("expired"))
         {
             return "Your JWT token has expired. Please login again to get a new token.";
-        } else if (lowerMessage.contains("malformed") || lowerMessage.contains("invalid")) {
+        } else if (lowerMessage.contains("malformed") || lowerMessage.contains("invalid"))
+        {
             return "The JWT token format is invalid. Please ensure you're using a valid token.";
         } else if (lowerMessage.contains("signature"))
         {

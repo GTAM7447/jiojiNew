@@ -3,6 +3,7 @@ package com.spring.jwt.service.security;
 import com.spring.jwt.entity.User;
 import com.spring.jwt.exception.BaseException;
 import com.spring.jwt.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserDetailsServiceCustom implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -38,7 +40,7 @@ public class UserDetailsServiceCustom implements UserDetailsService {
     private UserDetailsCustom getUserDetails(String username) {
         User user = userRepository.findByEmail(username);
         if (ObjectUtils.isEmpty(user)) {
-            System.out.println("Login failed: User not found for email/username: " + username);
+            log.warn("Login attempt failed: User not found for username: {}", username);
             throw new BaseException(String.valueOf(HttpStatus.BAD_REQUEST.value()), "Invalid username or password!");
         }
 

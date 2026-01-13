@@ -110,13 +110,13 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         LocalDateTime expiryThreshold = LocalDateTime.now().minusMinutes(OTP_EXPIRY_MINUTES);
 
         List<EmailVerification> expiredOtps = emailVerificationRepo.findByStatusAndCreationTimeBefore(STATUS_NOT_VERIFIED, expiryThreshold);
-        System.out.println("Found " + expiredOtps.size() + " expired OTPs before deletion.");
+        log.debug("Found {} expired OTPs for cleanup", expiredOtps.size());
 
         if (!expiredOtps.isEmpty()) {
             int deletedRecords = emailVerificationRepo.deleteByStatusAndCreationTimeBefore(STATUS_NOT_VERIFIED, expiryThreshold);
-            System.out.println("✅ Deleted " + deletedRecords + " expired OTPs at 2:05 PM.");
+            log.info("Deleted {} expired OTPs during scheduled cleanup", deletedRecords);
         } else {
-            System.out.println("❌ No expired OTPs found.");
+            log.debug("No expired OTPs found during scheduled cleanup");
         }
     }
 

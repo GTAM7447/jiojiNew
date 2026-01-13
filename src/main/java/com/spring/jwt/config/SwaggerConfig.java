@@ -51,7 +51,6 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")
                                 .description("JWT token for authentication")))
                 .tags(Arrays.asList(
-                        // User API Tags
                         new Tag().name("Authentication").description("User authentication and authorization"),
                         new Tag().name("User Management").description("User registration and profile management"),
                         new Tag().name("Profile Management").description("User profile operations"),
