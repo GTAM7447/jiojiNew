@@ -180,7 +180,7 @@ public class AppConfig {
 
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/user/**").permitAll()
-
+                .requestMatchers("/api/v1/documents/uploadByUser").permitAll()
                 .requestMatchers("/api/v1/documents/**").authenticated()
                 .requestMatchers("/api/v1/employeeFarmerSurveys/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
