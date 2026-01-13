@@ -98,7 +98,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends AbstractAuthenticat
                     user.setLastLogin(LocalDateTime.now());
                     user.setDeviceFingerprint(deviceFingerprint);
                     user.setFailedLoginAttempts(0);
-                    user.setAccountLocked(false);
+//                    user.setAccountLocked(false);
                     user.setAccountLockedUntil(null);
                     userRepository.save(user);
                     log.debug("Updated user login info and device fingerprint for user: {}", user.getEmail());

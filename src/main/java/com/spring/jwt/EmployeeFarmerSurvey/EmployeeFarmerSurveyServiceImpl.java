@@ -1,6 +1,7 @@
 package com.spring.jwt.EmployeeFarmerSurvey;
 
 import com.spring.jwt.Enums.FormStatus;
+import com.spring.jwt.Enums.PhotoType;
 import com.spring.jwt.FarmerLabReport.FarmerLabReportRepository;
 import com.spring.jwt.FarmerSelfieEmployeeFarmerSurvey.FarmerSelfieEmployeeFarmerSurveyRepository;
 import com.spring.jwt.entity.EmployeeFarmerSurvey;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -56,22 +58,59 @@ public class EmployeeFarmerSurveyServiceImpl implements EmployeeFarmerSurveyServ
 
 
 
+//    @Override
+//    public EmployeeFarmerSurveyDTO getSurveyById(Long surveyId) {
+//
+//        EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with ID: " + surveyId));
+//        EmployeeFarmerSurveyDTO dto = surveyMapper.toDto(survey);
+//        FarmerSelfieDTO selfieDTO = new FarmerSelfieDTO();
+//        selfieRepository.findBySurvey_SurveyId(surveyId).ifPresentOrElse(
+//                        selfie -> {
+//                            selfieDTO.setImageUrl(selfie.getImageUrl());
+//                            selfieDTO.setTakenAt(selfie.getTakenAt());
+//                            selfieDTO.setMessage("Selfie found");
+//                            },
+//                        () -> {
+//                            selfieDTO.setMessage("Farmer selfie not uploaded yet");
+//                        }
+//                );
+//        dto.setFarmerSelfie(selfieDTO);
+//        return dto;
+//    }
+
     @Override
     public EmployeeFarmerSurveyDTO getSurveyById(Long surveyId) {
 
-        EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId).orElseThrow(() -> new ResourceNotFoundException("Survey not found with ID: " + surveyId));
+        EmployeeFarmerSurvey survey = employeeFarmerSurveyRepository.findById(surveyId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Survey not found with ID: " + surveyId));
+
         EmployeeFarmerSurveyDTO dto = surveyMapper.toDto(survey);
+
         FarmerSelfieDTO selfieDTO = new FarmerSelfieDTO();
-        selfieRepository.findBySurvey_SurveyId(surveyId).ifPresentOrElse(
-                        selfie -> {
-                            selfieDTO.setImageUrl(selfie.getImageUrl());
-                            selfieDTO.setTakenAt(selfie.getTakenAt());
-                            selfieDTO.setMessage("Selfie found");
-                            },
-                        () -> {
-                            selfieDTO.setMessage("Farmer selfie not uploaded yet");
-                        }
-                );
+
+        List<FarmerSelfieEmployeeFarmerSurvey> photos =
+                selfieRepository.findBySurvey_SurveyId(surveyId);
+
+        if (photos.isEmpty()) {
+            selfieDTO.setMessage("Farmer selfie and signature not uploaded yet");
+        } else {
+
+            for (FarmerSelfieEmployeeFarmerSurvey photo : photos) {
+
+                if (photo.getPhotoType() == PhotoType.SELFIE) {
+                    selfieDTO.setImageUrl(photo.getImageUrl());
+                    selfieDTO.setTakenAt(photo.getTakenAt());
+                }
+
+                if (photo.getPhotoType() == PhotoType.SIGNATURE) {
+                    selfieDTO.setImageUrlS(photo.getImageUrl());
+                }
+            }
+
+            selfieDTO.setMessage("Farmer photos found");
+        }
+
         dto.setFarmerSelfie(selfieDTO);
         return dto;
     }

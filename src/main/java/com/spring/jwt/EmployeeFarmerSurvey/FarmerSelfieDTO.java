@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class FarmerSelfieDTO {
 
     private String imageUrl;
+    private String imageUrlS;
     private LocalDateTime takenAt;
     private String message;
 }

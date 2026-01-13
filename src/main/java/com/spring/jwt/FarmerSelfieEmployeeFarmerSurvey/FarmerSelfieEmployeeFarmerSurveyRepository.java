@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,7 +18,7 @@ public interface FarmerSelfieEmployeeFarmerSurveyRepository
 
     boolean existsBySurvey_SurveyId(Long surveyId);
 
-    Optional<FarmerSelfieEmployeeFarmerSurvey>findBySurvey_SurveyId(Long surveyId);
+//    Optional<FarmerSelfieEmployeeFarmerSurvey>findBySurvey_SurveyId(Long surveyId);
 
     Optional<FarmerSelfieEmployeeFarmerSurvey>
     findByFarmerSelfieEmployeeFarmerSurveyIdAndPhotoType(
@@ -37,4 +38,6 @@ public interface FarmerSelfieEmployeeFarmerSurveyRepository
         WHERE f.survey.surveyId = :surveyId
     """)
     void deleteBySurveyId(@Param("surveyId") Long surveyId);
+
+    List<FarmerSelfieEmployeeFarmerSurvey> findBySurvey_SurveyId(Long surveyId);
 }
