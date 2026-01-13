@@ -17,10 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class intercepts all responses from controllers and ensures sensitive
- * data is decrypted
+ * This class intercepts responses from USER controllers only and ensures sensitive
+ * data is decrypted.
+ * 
+ * IMPORTANT: Only applies to controllers in the specified base packages.
+ * This prevents unnecessary processing of non-user related responses.
  */
-@ControllerAdvice
+@ControllerAdvice(basePackages = {
+    "com.spring.jwt.controller"  // Only user-related controllers
+})
 @RequiredArgsConstructor
 @Slf4j
 public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
@@ -30,8 +35,21 @@ public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-
-        return true;
+        // Only process if the response contains User-related data
+        Class<?> returnTypeClass = returnType.getParameterType();
+        
+        // Check if return type is User-related
+        boolean isUserRelated = 
+            UserDTO.class.isAssignableFrom(returnTypeClass) ||
+            ResponseAllUsersDto.class.isAssignableFrom(returnTypeClass) ||
+            returnTypeClass.getName().contains("UserDTO") ||
+            returnTypeClass.getName().contains("ResponseAllUsersDto");
+        
+        if (isUserRelated) {
+            log.debug("DecryptionResponseProcessor will process response of type: {}", returnTypeClass.getName());
+        }
+        
+        return isUserRelated;
     }
 
     @Override
@@ -40,7 +58,7 @@ public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
             ServerHttpRequest request, ServerHttpResponse response) {
 
         try {
-            log.debug("Processing response for decryption: {}", body.getClass().getName());
+            log.debug("Processing user response for decryption: {}", body.getClass().getName());
             return processResponse(body);
         } catch (Exception e) {
             log.error("Error processing response for decryption: {}", e.getMessage(), e);
@@ -53,22 +71,26 @@ public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
             return null;
         }
 
-        // PERF: Skip expensive graph traversal for DocumentResponse classes
-        if (body.getClass().getName().contains("DocumentResponseDTO") ||
-                body.getClass().getName().contains("DocumentDetailResponseDTO") ||
-                body.getClass().getName().contains("PaginatedDocumentResponseDTO")) {
+        // Skip non-user related responses
+        String className = body.getClass().getName();
+        if (className.contains("DocumentResponseDTO") ||
+            className.contains("DocumentDetailResponseDTO") ||
+            className.contains("PaginatedDocumentResponseDTO") ||
+            className.contains("EmployeeFarmerSurvey") ||
+            className.contains("BaseResponseDTO")) {
             return body;
         }
 
-        // PERF: Handle ApiResponse wrapper containing Document types
+        // Handle ApiResponse wrapper
         if (body instanceof ApiResponse) {
             ApiResponse<?> response = (ApiResponse<?>) body;
             Object data = response.getData();
             if (data != null) {
-                String className = data.getClass().getName();
-                if (className.contains("DocumentResponseDTO") ||
-                        className.contains("DocumentDetailResponseDTO") ||
-                        className.contains("PaginatedDocumentResponseDTO")) {
+                String dataClassName = data.getClass().getName();
+                if (dataClassName.contains("DocumentResponseDTO") ||
+                    dataClassName.contains("DocumentDetailResponseDTO") ||
+                    dataClassName.contains("PaginatedDocumentResponseDTO") ||
+                    dataClassName.contains("EmployeeFarmerSurvey")) {
                     return body;
                 }
             }
@@ -95,8 +117,6 @@ public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
             for (Object item : list) {
                 if (item instanceof UserDTO) {
                     decryptUserDTO((UserDTO) item);
-                } else {
-                    processResponse(item);
                 }
             }
             return body;
@@ -116,47 +136,27 @@ public class DecryptionResponseProcessor implements ResponseBodyAdvice<Object> {
             return body;
         }
 
-        try {
-            Map<String, Object> objectMap = objectMapper.convertValue(body, Map.class);
-
-            for (String key : objectMap.keySet()) {
-                Object value = objectMap.get(key);
-
-                if (value instanceof Map || value instanceof List) {
-                    processResponse(value);
-                }
-            }
-
-            if (objectMap.containsKey("list")) {
-                Object listObj = objectMap.get("list");
-                if (listObj instanceof List) {
-                    log.debug("Found 'list' field in response object, processing it");
-                    processResponse(listObj);
-                }
-            }
-
-            return body;
-        } catch (Exception e) {
-            log.debug("Could not process complex object for decryption: {}", e.getMessage());
-            return body;
-        }
+        return body;
     }
 
     private void decryptUserDTO(UserDTO user) {
+        // Decryption logic is currently commented out
+        // Uncomment when encryption is fully implemented
+        
         // try {
-        // if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
-        // user.setFirstName(encryptionUtil.decrypt(user.getFirstName()));
-        // }
+        //     if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
+        //         user.setFirstName(encryptionUtil.decrypt(user.getFirstName()));
+        //     }
         //
-        // if (user.getLastName() != null && !user.getLastName().isEmpty()) {
-        // user.setLastName(encryptionUtil.decrypt(user.getLastName()));
-        // }
+        //     if (user.getLastName() != null && !user.getLastName().isEmpty()) {
+        //         user.setLastName(encryptionUtil.decrypt(user.getLastName()));
+        //     }
         //
-        // if (user.getAddress() != null && !user.getAddress().isEmpty()) {
-        // user.setAddress(encryptionUtil.decrypt(user.getAddress()));
-        // }
+        //     if (user.getAddress() != null && !user.getAddress().isEmpty()) {
+        //         user.setAddress(encryptionUtil.decrypt(user.getAddress()));
+        //     }
         // } catch (Exception e) {
-        // log.error("Error decrypting user data: {}", e.getMessage());
+        //     log.error("Error decrypting user data: {}", e.getMessage());
         // }
     }
 }

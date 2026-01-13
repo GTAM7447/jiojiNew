@@ -54,35 +54,4 @@ public class DataInitializer {
         }
     }
 
-
-
-
-//    private void initProducts() {
-//        if (productRepository.count() == 0) {
-//            List<Product> products = new ArrayList<>();
-//
-//            // 17 Seed Products
-//            String[] seedNames = {
-//                    "Wheat DBW 187", "Wheat DBW 222", "Wheat HD 2967", "Wheat HD 3086", "Wheat PBW 343",
-//                    "Rice Pusa Basmati 1121", "Rice Pusa Basmati 1509", "Rice Pusa Basmati 1718", "Rice MTU 1010",
-//                    "Corn Hybrid 1", "Corn Hybrid 2", "Corn Single Cross",
-//                    "Soybean JS 335", "Soybean JS 9560",
-//                    "Cotton Bt II", "Cotton Bt III", "Mustard Pusa Bio 902"
-//            };
-//
-//            for (String name : seedNames) {
-//                Product product = new Product();
-//                product.setProductName(name);
-//                product.setProductType(Product.ProductType.SEED);
-////                product.setDescription("High quality " + name + " for better yield.");
-//                product.setPrice(100.0 + (Math.random() * 50));
-//                product.setActive(true);
-//                product.setCreatedAt(LocalDateTime.now());
-//                products.add(product);
-//            }
-//
-//            productRepository.saveAll(products);
-//            log.info("Initialized {} products", products.size());
-//        }
-//    }
 }

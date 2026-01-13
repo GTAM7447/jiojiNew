@@ -44,9 +44,13 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader(jwtConfig.getHeader());
 
-        // No Authorization header → let Spring Security decide
         if (!StringUtils.hasText(authHeader) || !authHeader.startsWith(jwtConfig.getPrefix() + " ")) {
             filterChain.doFilter(request, response);
             return;
@@ -164,8 +168,6 @@ public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
             return "Unauthorized";
         }
     }
-
-    /* ================= RESPONSE HANDLERS ================= */
 
     private void handleInvalidToken(HttpServletResponse response, String message)
             throws IOException {

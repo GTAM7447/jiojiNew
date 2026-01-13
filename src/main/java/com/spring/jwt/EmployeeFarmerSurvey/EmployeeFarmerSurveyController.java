@@ -3,6 +3,7 @@ package com.spring.jwt.EmployeeFarmerSurvey;
 import com.spring.jwt.Enums.FormStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
  *  - Default sorting: surveyId DESC
  */
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/employeeFarmerSurveys")
 @RequiredArgsConstructor
 public class EmployeeFarmerSurveyController {
@@ -121,9 +123,11 @@ public class EmployeeFarmerSurveyController {
     @DeleteMapping("/{surveyId}")
     public ResponseEntity<BaseResponseDTO1<Void>> deleteSurvey(
             @PathVariable Long surveyId) {
-
+        
+        log.debug("Delete request received for survey ID: {}", surveyId);
         employeeFarmerSurveyService.deleteSurvey(surveyId);
-
+        log.info("Survey deleted successfully: {}", surveyId);
+        
         return ResponseEntity.ok(new BaseResponseDTO1<>("200", "Survey deleted successfully", null));
     }
 

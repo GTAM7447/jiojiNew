@@ -44,7 +44,6 @@ public class AuthController {
     private final UserRepository userRepository;
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
-    // one login for Admin, Surveyor, Lab Technician, and Users
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request,
@@ -66,13 +65,11 @@ public class AuthController {
 
             registerResultingSession(accessToken, refreshToken, userDetails.getUsername());
 
-            // Set Refresh Token Cookie
             Cookie refreshTokenCookie = createRefreshTokenCookie(refreshToken);
             response.addCookie(refreshTokenCookie);
 
-            // Set Access Token Cookie (optional, but good for some clients)
             Cookie accessTokenCookie = new Cookie("access_token", accessToken);
-            accessTokenCookie.setHttpOnly(false); // Accessible to JS if needed, or secure
+            accessTokenCookie.setHttpOnly(false);
             accessTokenCookie.setSecure(true);
             accessTokenCookie.setPath("/");
             accessTokenCookie.setMaxAge((int) jwtConfig.getExpiration());

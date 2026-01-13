@@ -97,7 +97,6 @@ public class JwtUsernamePasswordAuthenticationFilter extends AbstractAuthenticat
                 if (user != null) {
                     user.setLastLogin(LocalDateTime.now());
                     user.setDeviceFingerprint(deviceFingerprint);
-                    // Reset failed login attempts on successful login
                     user.setFailedLoginAttempts(0);
                     user.setAccountLocked(false);
                     user.setAccountLockedUntil(null);

@@ -19,7 +19,14 @@ public class SqlInjectionFilter implements Filter, Ordered {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        SqlInjectionRequestWrapper wrappedRequest = new SqlInjectionRequestWrapper((HttpServletRequest) request);
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        SqlInjectionRequestWrapper wrappedRequest = new SqlInjectionRequestWrapper(httpRequest);
         chain.doFilter(wrappedRequest, response);
     }
 

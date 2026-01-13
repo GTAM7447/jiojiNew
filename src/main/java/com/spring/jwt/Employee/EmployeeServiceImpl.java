@@ -75,7 +75,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         dto.setVehicleNumber(employee.getVehicleNumber());
         dto.setDescription(employee.getDescription());
 
-        // User details
         dto.setUserId(user.getUserId());
         dto.setUserEmail(user.getEmail());
         dto.setUserMobile(user.getMobileNumber());

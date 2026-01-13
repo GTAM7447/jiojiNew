@@ -54,20 +54,20 @@ public class KeystoreInitializer {
         
         // Check if keystore already exists
         if (Files.exists(keystorePath)) {
-            System.out.println("Keystore already exists at: " + keystorePath.toAbsolutePath());
+            logger.info("Keystore already exists at: {}", keystorePath.toAbsolutePath());
             ensureKeystoreInClasspath(keystorePath);
             return;
         }
         
-        System.out.println("Keystore not found, generating a new one");
+        logger.info("Keystore not found, generating a new one");
 
         // Create resources directory if it doesn't exist
         if (!Files.exists(resourcesPath)) {
             Files.createDirectories(resourcesPath);
-            System.out.println("Created resources directory at: " + resourcesPath.toAbsolutePath());
+            logger.info("Created resources directory at: {}", resourcesPath.toAbsolutePath());
         }
         
-        System.out.println("Generating new keystore at: " + keystorePath.toAbsolutePath());
+        logger.info("Generating new keystore at: {}", keystorePath.toAbsolutePath());
 
         // Build command as array to avoid issues with spaces and special characters
         String[] command = {
@@ -91,14 +91,14 @@ public class KeystoreInitializer {
         int exitCode = process.waitFor();
         
         if (exitCode == 0) {
-            System.out.println("Keystore generated successfully at: " + keystorePath.toAbsolutePath());
+            logger.info("Keystore generated successfully at: {}", keystorePath.toAbsolutePath());
             ensureKeystoreInClasspath(keystorePath);
         } else {
-            System.err.println("Failed to generate keystore. Exit code: " + exitCode);
+            logger.error("Failed to generate keystore. Exit code: {}", exitCode);
 
             byte[] errorBytes = process.getErrorStream().readAllBytes();
             if (errorBytes.length > 0) {
-                System.err.println("Error from keytool: " + new String(errorBytes));
+                logger.error("Error from keytool: {}", new String(errorBytes));
             }
             
             throw new RuntimeException("Failed to generate keystore");
@@ -117,7 +117,7 @@ public class KeystoreInitializer {
         
         Path targetPath = Paths.get("target/classes/keystore.p12");
         Files.copy(keystorePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        System.out.println("Keystore copied to classpath at: " + targetPath.toAbsolutePath());
+        logger.debug("Keystore copied to classpath at: {}", targetPath.toAbsolutePath());
     }
     
     /**

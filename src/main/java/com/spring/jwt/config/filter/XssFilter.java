@@ -31,6 +31,12 @@ public class XssFilter implements Filter, Ordered {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+        if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
         String path = httpRequest.getRequestURI();
 
         if (path.startsWith("/user/registerUser")) {
