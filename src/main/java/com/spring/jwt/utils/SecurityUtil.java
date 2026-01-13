@@ -52,6 +52,8 @@ public final class SecurityUtil
                 ". Expected UserDetailsCustom but got " + principal.getClass().getSimpleName() + 
                 ". This indicates an authentication configuration issue."
         );
+
+
     }
 
 }

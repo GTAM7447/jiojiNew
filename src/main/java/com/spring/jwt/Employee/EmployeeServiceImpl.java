@@ -2,8 +2,14 @@ package com.spring.jwt.Employee;
 
 import com.spring.jwt.entity.Employee;
 import com.spring.jwt.entity.User;
+import com.spring.jwt.exception.BaseException;
 import com.spring.jwt.exception.ResourceNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +20,9 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+
+
+
 
     @Override
     public EmployeeResponseDTO getEmployeeById(Long employeeId) {
@@ -38,17 +47,47 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeResponseDTO> getAllEmployees() {
+    public Page<EmployeeResponseDTO> getAllEmployees(int page, int size) {
 
-        List<Employee> employees = employeeRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("employeeId").descending());
 
-        if (employees.isEmpty()) {
+        Page<Employee> employeePage = employeeRepository.findAll(pageable);
+
+        if (employeePage.isEmpty()) {
             throw new ResourceNotFoundException("No employees found");
         }
 
-        return employees.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return employeePage.map(this::mapToResponse);
+    }
+
+
+    @Override
+    @Transactional
+    public EmployeeResponseDTO updateAccountLockStatus(Long employeeId, Boolean accountLocked) {
+
+        try {
+            if (accountLocked == null) {
+                throw new BaseException("400", "accountLocked value must not be null");
+            }
+
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() ->
+                            new BaseException("404", "Employee not found with id: " + employeeId));
+
+            User user = employee.getUser();
+
+            // 🔐 Update only account lock status
+            user.setAccountLocked(accountLocked);
+
+            employeeRepository.save(employee); // cascades to User
+
+            return mapToResponse(employee);
+
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException("500", "Failed to update account lock status");
+        }
     }
 
 
@@ -81,4 +120,130 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return dto;
     }
+    @Override
+    public EmployeeResponseDTO patchEmployeeByUserId(Long userId, EmployeeUpdateRequestDTO dto) {
+
+        try {
+            Employee employee = employeeRepository.findByUser_UserId(userId)
+                    .orElseThrow(() ->
+                            new BaseException("404", "Employee not found for userId: " + userId));
+
+            User user = employee.getUser();
+
+            // ---------- PATCH USER ----------
+            if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+                user.setEmail(dto.getEmail());
+            }
+
+            if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
+                try {
+                    user.setMobileNumber(Long.parseLong(dto.getPhone()));
+                } catch (NumberFormatException ex) {
+                    throw new BaseException("400", "Invalid phone number format");
+                }
+            }
+
+            // ---------- PATCH EMPLOYEE ----------
+            if (dto.getCompanyName() != null)
+                employee.setCompanyName(dto.getCompanyName());
+
+            if (dto.getAddress() != null)
+                employee.setAddress(dto.getAddress());
+
+            if (dto.getPermanentAddress() != null)
+                employee.setPermanentAddress(dto.getPermanentAddress());
+
+            if (dto.getCity() != null)
+                employee.setCity(dto.getCity());
+
+            if (dto.getDistrict() != null)
+                employee.setDistrict(dto.getDistrict());
+
+            if (dto.getState() != null)
+                employee.setState(dto.getState());
+
+            if (dto.getAccountNumber() != null)
+                employee.setAccountNumber(dto.getAccountNumber());
+
+            if (dto.getIfscCode() != null)
+                employee.setIfscCode(dto.getIfscCode());
+
+            if (dto.getPfNumber() != null)
+                employee.setPfNumber(dto.getPfNumber());
+
+            if (dto.getInsuranceNumber() != null)
+                employee.setInsuranceNumber(dto.getInsuranceNumber());
+
+            if (dto.getPanNumber() != null)
+                employee.setPanNumber(dto.getPanNumber());
+
+            if (dto.getVehicleNumber() != null)
+                employee.setVehicleNumber(dto.getVehicleNumber());
+
+            if (dto.getDescription() != null)
+                employee.setDescription(dto.getDescription());
+
+            employeeRepository.save(employee);
+
+            return mapToResponse(employee);
+
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException("500", "Failed to update employee details");
+        }
+    }
+
+    @Override
+    @Transactional
+    public EmployeeResponseDTO updateAccountLockStatusByUserId(Long userId, Boolean accountLocked) {
+
+        if (accountLocked == null) {
+            throw new BaseException("400", "accountLocked value must not be null");
+        }
+
+        Employee employee = employeeRepository.findByUser_UserId(userId)
+                .orElseThrow(() ->
+                        new BaseException("404", "Employee not found for userId: " + userId));
+
+        employee.getUser().setAccountLocked(accountLocked);
+
+        employeeRepository.save(employee);
+
+        return mapToResponse(employee);
+    }
+
+
+    private EmployeeResponseDTO mapToResponse(Employee employee) {
+
+        EmployeeResponseDTO dto = new EmployeeResponseDTO();
+        User user = employee.getUser();
+
+        // ---------- IDS ----------
+        dto.setEmployeeId(employee.getEmployeeId());
+        dto.setUserId(user.getUserId());
+
+        // ---------- USER ----------
+
+
+        // ---------- EMPLOYEE ----------
+        dto.setEmployeeCode(employee.getEmployeeCode());
+        dto.setCompanyName(employee.getCompanyName());
+        dto.setAddress(employee.getAddress());
+        dto.setPermanentAddress(employee.getPermanentAddress());
+        dto.setCity(employee.getCity());
+        dto.setDistrict(employee.getDistrict());
+        dto.setState(employee.getState());
+        dto.setAccountNumber(employee.getAccountNumber());
+        dto.setIfscCode(employee.getIfscCode());
+        dto.setPfNumber(employee.getPfNumber());
+        dto.setInsuranceNumber(employee.getInsuranceNumber());
+        dto.setPanNumber(employee.getPanNumber());
+        dto.setVehicleNumber(employee.getVehicleNumber());
+        dto.setDescription(employee.getDescription());
+
+        return dto;
+    }
+
 }
+

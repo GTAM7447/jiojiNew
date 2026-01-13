@@ -53,4 +53,37 @@ public class EmployeeMapper {
 
         return dto;
     }
+
+    private EmployeeResponseDTO mapToResponse(Employee employee) {
+
+        EmployeeResponseDTO dto = new EmployeeResponseDTO();
+        User user = employee.getUser();
+
+        // ---------- IDS ----------
+        dto.setEmployeeId(employee.getEmployeeId());
+        dto.setUserId(user.getUserId());
+
+        // ---------- USER ----------
+      ;
+
+        // ---------- EMPLOYEE ----------
+        dto.setEmployeeCode(employee.getEmployeeCode());
+        dto.setCompanyName(employee.getCompanyName());
+        dto.setAddress(employee.getAddress());
+        dto.setPermanentAddress(employee.getPermanentAddress());
+        dto.setCity(employee.getCity());
+        dto.setDistrict(employee.getDistrict());
+        dto.setState(employee.getState());
+        dto.setAccountNumber(employee.getAccountNumber());
+        dto.setIfscCode(employee.getIfscCode());
+        dto.setPfNumber(employee.getPfNumber());
+        dto.setInsuranceNumber(employee.getInsuranceNumber());
+        dto.setPanNumber(employee.getPanNumber());
+        dto.setVehicleNumber(employee.getVehicleNumber());
+        dto.setDescription(employee.getDescription());
+
+        return dto;
+    }
+
+
 }

@@ -151,8 +151,7 @@ public class FarmerSelfieEmployeeFarmerSurveyServiceImpl
     @Override
     public FarmerSelfieResponseDTO getSelfieBySurveyId(Long surveyId) {
 
-        FarmerSelfieEmployeeFarmerSurvey selfie = selfieRepository.findBySurvey_SurveyId(surveyId).orElseThrow(() -> new ResourceNotFoundException("Selfie not found for survey ID: " + surveyId));
-        return mapToResponse(selfie);
+      return null;
     }
 
     @Override

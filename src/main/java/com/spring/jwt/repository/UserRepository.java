@@ -24,4 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     List<User> findAllByStatusTrue();
+
+    boolean existsByUserIdAndAccountLockedTrue(Integer userId);
 }

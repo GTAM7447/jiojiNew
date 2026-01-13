@@ -1,6 +1,7 @@
 package com.spring.jwt.jwt.impl;
 
 import com.spring.jwt.exception.BaseException;
+import com.spring.jwt.exception.UnauthorizedException;
 import com.spring.jwt.jwt.JwtConfig;
 import com.spring.jwt.jwt.JwtService;
 import com.spring.jwt.jwt.TokenBlacklistService;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.security.auth.login.AccountLockedException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
@@ -93,7 +96,20 @@ public class JwtServiceImpl implements JwtService {
         log.info("Roles: {}", roles);
 
         Long userId = userDetailsCustom.getUserId();
-        String firstName = userDetailsCustom.getFirstName();
+
+        try {
+            boolean isLocked = userRepository.existsByUserIdAndAccountLockedTrue(Math.toIntExact(userId));
+
+            if (isLocked) {
+                throw new BaseException(
+                        String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                        "connect with admin Your account is lock"
+                );
+            }
+        } catch (BaseException ex) {
+            throw ex;
+        }
+            String firstName = userDetailsCustom.getFirstName();
         
         log.debug("Generating access token for user: {}, device: {}", 
                 userDetailsCustom.getUsername(), 
