@@ -1,6 +1,8 @@
 package com.spring.jwt.repository;
 
 import com.spring.jwt.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +28,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByStatusTrue();
 
     boolean existsByUserIdAndAccountLockedTrue(Integer userId);
+
+    @Query("""
+        SELECT DISTINCT u FROM User u
+        JOIN u.roles r
+        WHERE r.name = :roleName
+    """)
+    Page<User> findAllByRoleName(
+            @Param("roleName") String roleName,
+            Pageable pageable
+    );
 }
