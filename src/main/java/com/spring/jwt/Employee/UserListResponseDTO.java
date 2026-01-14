@@ -13,4 +13,5 @@ public class UserListResponseDTO {
     private String email;
     private Long mobile;
     private Boolean accountLocked;
+    private String employeeCode;
 }

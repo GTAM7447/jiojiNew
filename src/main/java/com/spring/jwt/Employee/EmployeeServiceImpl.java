@@ -235,7 +235,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                         buildFullName(user),
                         user.getEmail(),
                         user.getMobileNumber(),
-                        user.getAccountLocked()
+                        user.getAccountLocked(),
+                        buildEmployeeCode(user)
                 )
         );
     }
@@ -244,6 +245,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         return (user.getFirstName() == null ? "" : user.getFirstName()) +
                 " " +
                 (user.getLastName() == null ? "" : user.getLastName());
+    }
+    private String buildEmployeeCode(User user) {
+        return ("EMP"+user.getUserId());
     }
 
     private EmployeeResponseDTO mapToResponse(Employee employee) {
