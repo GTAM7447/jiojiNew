@@ -4,6 +4,7 @@ import com.spring.jwt.entity.Employee;
 import com.spring.jwt.entity.User;
 import com.spring.jwt.exception.BaseException;
 import com.spring.jwt.exception.ResourceNotFoundException;
+import com.spring.jwt.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
 
 
 
@@ -213,6 +216,35 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapToResponse(employee);
     }
 
+
+    @Override
+    public Page<UserListResponseDTO> getUsers(String role, int page, int size) {
+
+        String finalRole = StringUtils.hasText(role)
+                ? role.toUpperCase()
+                : "USER";
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("userId").descending());
+
+        Page<User> usersPage =
+                userRepository.findAllByRoleName(finalRole, pageable);
+
+        return usersPage.map(user ->
+                new UserListResponseDTO(
+                        user.getUserId(),
+                        buildFullName(user),
+                        user.getEmail(),
+                        user.getMobileNumber(),
+                        user.getAccountLocked()
+                )
+        );
+    }
+
+    private String buildFullName(User user) {
+        return (user.getFirstName() == null ? "" : user.getFirstName()) +
+                " " +
+                (user.getLastName() == null ? "" : user.getLastName());
+    }
 
     private EmployeeResponseDTO mapToResponse(Employee employee) {
 

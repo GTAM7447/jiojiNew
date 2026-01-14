@@ -1,6 +1,7 @@
 package com.spring.jwt.Employee;
 
 
+import com.spring.jwt.entity.User;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface EmployeeService {
     EmployeeResponseDTO patchEmployeeByUserId(Long userId, EmployeeUpdateRequestDTO dto);
 
     EmployeeResponseDTO updateAccountLockStatusByUserId(Long userId, Boolean accountLocked);
+
+    Page<UserListResponseDTO> getUsers(String role, int page, int size);
 }

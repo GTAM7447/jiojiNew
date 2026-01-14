@@ -90,4 +90,17 @@ public class EmployeeController {
         );
     }
 
+    @GetMapping("/getUsers")
+    public ResponseEntity<BaseResponseDTO1<Page<UserListResponseDTO>>> getUsers(
+            @RequestParam(required = false) String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(new BaseResponseDTO1<>(
+                "200",
+                "Account"+role+ "get successfully",
+                employeeService.getUsers(role, page, size)
+        ));
+    }
+
 }
