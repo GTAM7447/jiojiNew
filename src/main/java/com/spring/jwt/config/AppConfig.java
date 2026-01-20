@@ -185,13 +185,14 @@ public class AppConfig {
                 .requestMatchers("/api/v1/employeeFarmerSurveys/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/**").permitAll()
-                .requestMatchers("api/v1/farmer_selfie_Survey/**").permitAll()
+                .requestMatchers("/api/v1/farmer_selfie_Survey/**").permitAll()
                 .requestMatchers("/api/v1/lab_report/**").permitAll()
                 .requestMatchers("/api/v1/products/**").permitAll()
-                .requestMatchers("api/v1/company-weekly-off/**").permitAll()
+                .requestMatchers("/api/v1/company-weekly-off/**").permitAll()
                 .requestMatchers("/api/v1/attendance/**").permitAll()
                 .requestMatchers("/api/v1/product-photo/**").permitAll()
                 .requestMatchers("/api/v1/employees/**").permitAll()
+                .requestMatchers("/api/v1/emp-documents").permitAll()
 
                 .anyRequest().authenticated());
 
